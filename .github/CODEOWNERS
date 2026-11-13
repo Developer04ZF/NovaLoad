@@ -1,0 +1,4 @@
+* @novaload/maintainers
+/server/security.ts @novaload/security
+/src-tauri/src/security.rs @novaload/security
+/.github/ @novaload/release-engineers

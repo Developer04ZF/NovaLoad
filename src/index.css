@@ -1,0 +1,113 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --nl-bg-canvas: #f8fafc;
+    --nl-bg-surface: #ffffff;
+    --nl-bg-subtle: #f1f5f9;
+    --nl-border: #e2e8f0;
+    --nl-text-primary: #0f172a;
+    --nl-text-secondary: #475569;
+    --nl-text-muted: #64748b;
+    --nl-accent: #2563eb;
+    --nl-accent-hover: #1d4ed8;
+  }
+
+  .dark {
+    --nl-bg-canvas: #0b0e14;
+    --nl-bg-surface: #121722;
+    --nl-bg-subtle: #18202f;
+    --nl-border: #232d3f;
+    --nl-text-primary: #f1f5f9;
+    --nl-text-secondary: #94a3b8;
+    --nl-text-muted: #64748b;
+    --nl-accent: #3b82f6;
+    --nl-accent-hover: #60a5fa;
+  }
+
+  html {
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom scrollbar refined for desktop utility */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.25);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.45);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes nl-flow {
+  0% {
+    stroke-dashoffset: 36;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes nl-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes nl-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+.animate-nl-flow {
+  stroke-dasharray: 6 6;
+  animation: nl-flow 1.2s linear infinite;
+}
+
+.animate-nl-float {
+  animation: nl-float 3.4s ease-in-out infinite;
+}
+
+.animate-nl-sweep {
+  animation: nl-sweep 1.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}

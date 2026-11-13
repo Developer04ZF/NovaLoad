@@ -1,0 +1,8 @@
+{
+  "name": "NovaLoad",
+  "description": "Next-generation open-source desktop download manager with multi-connection acceleration, persistent queues, media extraction, browser integration, and optional Gemini AI file management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

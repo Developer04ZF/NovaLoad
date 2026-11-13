@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you reference NovaLoad in research or technical documentation, please cite it as below."
+title: "NovaLoad: Open-Source Multi-Connection Desktop Download Manager"
+version: "1.0.0"
+date-released: "2026-11-13"
+license: "Apache-2.0"
+authors:
+  - name: "NovaLoad Contributors"
+repository-code: "https://github.com/novaload/novaload"

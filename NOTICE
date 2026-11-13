@@ -1,0 +1,12 @@
+NovaLoad
+Copyright 2026 NovaLoad Contributors
+
+This product includes original software developed by the NovaLoad project,
+licensed under the Apache License, Version 2.0.
+
+Original documentation under docs/ is licensed under Creative Commons
+Attribution 4.0 International (CC BY 4.0) unless otherwise stated.
+
+Original visual assets, brand marks, mascot ("Novi"), and custom SVG
+illustrations under src/components/svg/ and docs/assets/ are licensed
+under Apache License 2.0 / CC BY 4.0 dual terms for open-source distribution.

@@ -1,0 +1,28 @@
+name: Security & Dependency Audit
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  npm-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm ci
+      - run: npm audit --audit-level=high
+
+  cargo-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: rustsec/audit-check@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          cargo-lock: src-tauri/Cargo.lock
+        continue-on-error: true

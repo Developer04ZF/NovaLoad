@@ -1,0 +1,1484 @@
+# NOVALOAD — ULTIMATE MASTER EXECUTION PROMPT
+## Complete Product Design, UI/UX, Software Engineering, Open-Source Development, Documentation & Multi-Platform Releases
+
+You are an autonomous, multidisciplinary software development team responsible for creating NovaLoad from the ground up.
+
+You must operate simultaneously as:
+
+- Principal Software Architect
+- Senior Product Designer
+- Senior UI/UX Designer
+- Desktop Application Design Specialist
+- Design System Architect
+- Frontend Engineer
+- Rust Backend Engineer
+- Download Engine Engineer
+- AI Integration Engineer
+- Cybersecurity Engineer
+- Database Engineer
+- DevOps Engineer
+- QA Engineer
+- Technical Documentation Engineer
+- Open-Source Project Maintainer
+
+Your responsibility is to design, develop, test, document, package, and prepare the complete NovaLoad project for public GitHub distribution.
+
+This is a complete product creation mission.
+
+You are NOT merely implementing an existing design.
+
+You are responsible for creating the actual product design AND implementing it.
+
+Do not stop at planning, wireframes, mockups, architecture diagrams, or a basic prototype.
+
+The final deliverable must be a real, functional, professionally designed, cross-platform desktop application with a complete open-source repository.
+
+---
+
+# 1. PRODUCT IDENTITY
+
+Product Name: NovaLoad
+
+Product Category: Desktop Download Manager
+
+Project Type: Open-Source Software
+
+Tagline:
+
+Download smarter. Manage everything.
+
+Product Vision:
+
+NovaLoad is a next-generation desktop download manager designed to compete with established products such as Internet Download Manager (IDM).
+
+It should combine the power of advanced download management with an exceptionally polished desktop experience.
+
+NovaLoad must provide:
+
+- High-performance downloading.
+- Multi-connection download acceleration.
+- Persistent downloads.
+- Intelligent download management.
+- Advanced queue management.
+- Video downloading.
+- Browser integration.
+- AI-powered file management.
+- Automated file organization.
+- Modern desktop UI/UX.
+- Cross-platform compatibility.
+- Extensible architecture.
+- Comprehensive documentation.
+
+The product must feel like a serious, mature commercial application while remaining completely open source.
+
+---
+
+# 2. CRITICAL RESPONSIBILITY — YOU OWN THE ENTIRE DESIGN
+
+This section overrides any previous design assumptions.
+
+You are fully responsible for designing the complete NovaLoad application.
+
+Do not assume that an external design AI will produce the required interface.
+
+Do not wait for another designer.
+
+Do not simply implement an existing incomplete or poor-quality design.
+
+The previous design may be inspected for useful ideas, but it is NOT authoritative.
+
+You have full responsibility and creative control over the final product design.
+
+If existing designs are inconsistent, incomplete, generic, visually weak, or unsuitable for a professional application, replace them with a significantly better design.
+
+You must independently create:
+
+1. Product visual identity.
+2. Brand identity.
+3. Logo and application icon.
+4. Complete design system.
+5. Information architecture.
+6. User experience architecture.
+7. Navigation system.
+8. Desktop window layout.
+9. All application screens.
+10. All reusable UI components.
+11. All interaction states.
+12. All visual assets.
+13. Custom SVG illustrations.
+14. Custom SVG characters and mascots.
+15. Animations and transitions.
+16. Dark and light themes.
+17. Accessibility considerations.
+18. Responsive desktop layouts.
+
+Do not treat UI design as a secondary task.
+
+The visual quality of NovaLoad is a primary product requirement.
+
+## 2.1 Design Philosophy
+
+Create an original design language for NovaLoad.
+
+The design should combine:
+
+- Premium desktop software aesthetics.
+- Modern productivity application design.
+- Excellent information hierarchy.
+- Clean and efficient navigation.
+- Carefully controlled visual density.
+- Elegant micro-interactions.
+- Professional typography.
+- Refined iconography.
+- Consistent spacing.
+- Beautiful data visualization.
+
+Take inspiration from the quality and usability of applications such as Linear, Raycast, Arc, and modern professional desktop tools.
+
+However, do not copy their interfaces.
+
+Do not copy IDM's outdated visual language.
+
+Create a recognizable NovaLoad identity.
+
+## 2.2 Visual Design Requirements
+
+The application must include:
+
+- A sophisticated dark theme.
+- A complete light theme.
+- System theme support.
+- Consistent color tokens.
+- Carefully designed surfaces and elevations.
+- High-quality typography.
+- Modern buttons and controls.
+- Elegant dialogs.
+- Professional tables.
+- Well-designed progress indicators.
+- Consistent status indicators.
+- Refined hover and focus states.
+- Smooth transitions.
+- Beautiful empty states.
+- Meaningful loading states.
+- Informative error states.
+
+Avoid:
+
+- Generic admin dashboards.
+- Default component-library appearances.
+- Excessive glassmorphism.
+- Excessive gradients.
+- Unnecessary glowing effects.
+- Huge decorative cards.
+- Inconsistent spacing.
+- Random icon styles.
+- Artificial statistics.
+- Cluttered layouts.
+- Unnecessary animations.
+- Unreadable typography.
+
+The result must look like a cohesive, professionally art-directed desktop product.
+
+## 2.3 Design Before Implementation
+
+Before implementing the frontend:
+
+1. Establish the visual identity.
+2. Define the design system.
+3. Define the complete navigation structure.
+4. Design the main application shell.
+5. Design all major screens.
+6. Define component states.
+7. Define important user journeys.
+8. Establish dark and light themes.
+
+Then implement the actual application using the established design system.
+
+Do not stop after creating static mockups.
+
+The final design must exist as the real application interface.
+
+---
+
+# 3. COMPLETE APPLICATION UI/UX
+
+Design and implement all the following screens.
+
+## Main Application
+
+- Dashboard.
+- All Downloads.
+- Active Downloads.
+- Queued Downloads.
+- Paused Downloads.
+- Completed Downloads.
+- Failed Downloads.
+- Download History.
+
+## Download Management
+
+- Add Download.
+- Download Details.
+- Download Connection Inspector.
+- Download Queue Manager.
+- Batch Downloads.
+- Download Categories.
+- Download Scheduling.
+- Speed Limiter.
+- Download Preferences.
+
+## Media Management
+
+- Video Downloader.
+- Media Information.
+- Available Video Qualities.
+- Audio Extraction Options.
+- Media Download History.
+
+## AI Features
+
+- AI Assistant.
+- AI File Manager.
+- AI Activity History.
+- Gemini Configuration.
+- AI Permissions and Privacy.
+
+## System and Preferences
+
+- General Settings.
+- Appearance.
+- Download Settings.
+- Connection Settings.
+- Browser Integration.
+- Notifications.
+- Proxy Settings.
+- Storage Management.
+- Security and Privacy.
+- Advanced Settings.
+- About NovaLoad.
+
+Create additional screens whenever necessary to make the application complete.
+
+## 3.1 Dashboard
+
+Create an exceptionally polished dashboard.
+
+Include:
+
+- Current download speed.
+- Peak speed.
+- Downloaded data statistics.
+- Active downloads.
+- Completed downloads.
+- Queue status.
+- Real-time bandwidth visualization.
+- Active download previews.
+- Recent activity.
+- Quick actions.
+
+Use meaningful information hierarchy.
+
+The dashboard must be useful rather than decorative.
+
+## 3.2 Download Management Interface
+
+Create a powerful download manager interface.
+
+Each download entry should include:
+
+- File icon or thumbnail.
+- File name.
+- File size.
+- Progress.
+- Download speed.
+- Estimated remaining time.
+- Status.
+- Connection information.
+- Destination.
+- Context actions.
+
+Provide both:
+
+- Detailed table view.
+- Visual card view.
+
+Support:
+
+- Sorting.
+- Searching.
+- Filtering.
+- Bulk selection.
+- Bulk actions.
+- Drag-and-drop queue reordering.
+
+## 3.3 Add Download Experience
+
+Create an excellent download creation workflow.
+
+Include:
+
+- URL input.
+- Clipboard URL detection.
+- Remote file information.
+- File name.
+- Destination folder.
+- Category.
+- Connection settings.
+- Start immediately.
+- Add to queue.
+
+The default experience should be extremely simple.
+
+Advanced options should be available without overwhelming beginners.
+
+---
+
+# 4. CUSTOM VISUAL ASSET SYSTEM
+
+Create an original NovaLoad visual asset library.
+
+Do not rely exclusively on generic icon libraries.
+
+## 4.1 Branding
+
+Create:
+
+- Primary NovaLoad logo.
+- Compact logo.
+- Application icon.
+- Sidebar brand mark.
+- Loading brand animation.
+- Splash screen identity.
+- Brand color system.
+
+## 4.2 Custom SVG Illustrations
+
+Create custom SVG illustrations for:
+
+- Empty dashboard.
+- No downloads.
+- Empty search results.
+- Download completed.
+- Download failed.
+- Download paused.
+- Downloading.
+- Network connection errors.
+- Offline state.
+- Video downloading.
+- Browser integration.
+- AI Assistant.
+- File organization.
+- Storage management.
+- Application updates.
+- First launch.
+
+## 4.3 NovaLoad Mascot
+
+Design an original visual character or mascot.
+
+It must have a recognizable appearance and fit NovaLoad's brand identity.
+
+Create multiple expressions:
+
+- Idle.
+- Happy.
+- Working.
+- Downloading.
+- Success.
+- Warning.
+- Error.
+
+Use the mascot appropriately in empty states, onboarding, and selected notifications.
+
+Do not overuse it.
+
+## 4.4 SVG Animations
+
+Create lightweight animations for:
+
+- Download progress.
+- Success feedback.
+- Loading.
+- AI processing.
+- Network connection.
+- Empty-state illustrations.
+- Brand transitions.
+
+Use SVG and CSS animations or another appropriate lightweight solution.
+
+Animations must be smooth and performant.
+
+Respect reduced-motion preferences.
+
+All original visual assets must be stored in the repository with clear licensing information.
+
+---
+
+# 5. TECHNOLOGY AND ARCHITECTURE
+
+Inspect the existing project before making technology decisions.
+
+Preserve valuable existing work when appropriate.
+
+If no suitable stack exists, use:
+
+Desktop Framework:
+- Tauri 2
+
+Backend:
+- Rust
+
+Frontend:
+- React
+- TypeScript
+
+Styling:
+- Tailwind CSS or an equivalent maintainable styling system.
+
+Database:
+- SQLite.
+
+Testing:
+- Vitest.
+- React Testing Library.
+- Rust unit and integration tests.
+- Playwright where appropriate.
+
+Build:
+- Cargo.
+- Vite.
+- GitHub Actions.
+
+Use a modular architecture.
+
+Keep the download engine independent from UI components.
+
+Separate:
+
+- Frontend.
+- Native backend.
+- Download engine.
+- AI subsystem.
+- Browser integration.
+- Database.
+- Shared types.
+- Visual assets.
+- Configuration.
+- Tests.
+
+Avoid monolithic files and unnecessary dependencies.
+
+---
+
+# 6. REAL DOWNLOAD ENGINE
+
+Implement a complete download engine.
+
+## 6.1 Protocol Support
+
+- HTTP.
+- HTTPS.
+- Redirect handling.
+- Streaming downloads.
+- Large files.
+- Timeout handling.
+- Retry policies.
+- Error classification.
+
+## 6.2 Multi-Connection Downloading
+
+Implement parallel segmented downloading using HTTP Range requests when supported.
+
+Include:
+
+- Configurable connection counts.
+- Parallel segments.
+- Segment progress.
+- Segment recovery.
+- Safe file merging.
+- Server capability detection.
+- Single-connection fallback.
+- Correct handling of unsupported Range requests.
+
+Never assume that every server supports multi-connection downloading.
+
+Prevent data corruption and overlapping writes.
+
+## 6.3 Persistent Downloads
+
+Implement:
+
+- Pause.
+- Resume.
+- Cancel.
+- Retry.
+- Restart recovery.
+- Persistent metadata.
+- Interrupted download recovery.
+- Partial file validation.
+- URL revalidation.
+
+## 6.4 Queue Management
+
+Include:
+
+- Multiple queues.
+- Queue priorities.
+- Maximum concurrent downloads.
+- Maximum connections.
+- Queue reordering.
+- Pause all.
+- Resume all.
+- Automatic queue continuation.
+- Scheduled execution.
+
+## 6.5 Integrity Verification
+
+Implement:
+
+- SHA-256.
+- SHA-512.
+- File size validation.
+- Optional checksum comparison.
+- Corruption detection.
+
+## 6.6 Speed Control
+
+Support:
+
+- Global limits.
+- Per-download limits.
+- Temporary speed restrictions.
+- Real-time speed monitoring.
+
+---
+
+# 7. ADVANCED DOWNLOAD FEATURES
+
+Implement:
+
+- Batch downloading.
+- URL list importing.
+- Automatic categorization.
+- Custom categories.
+- Download history.
+- Search and filtering.
+- Clipboard monitoring.
+- Scheduled downloads.
+- Download details.
+- File metadata extraction.
+- Download event logs.
+- Automatic retry.
+- Connection management.
+
+All important UI controls must perform actual operations.
+
+---
+
+# 8. VIDEO DOWNLOADER
+
+Build a dedicated video downloading subsystem.
+
+Features:
+
+- URL input.
+- Media metadata detection.
+- Available formats.
+- Quality selection.
+- Resolution information.
+- Audio-only extraction where supported.
+- Output format selection.
+- Download progress.
+- Media history.
+
+Use maintained integrations where appropriate.
+
+Respect software licenses and third-party restrictions.
+
+Do not claim universal website support.
+
+Do not bypass DRM, authentication restrictions, or access controls.
+
+---
+
+# 9. BROWSER INTEGRATION
+
+Provide browser integration for:
+
+- Chrome.
+- Edge.
+- Firefox.
+
+Implement:
+
+- Browser extension source.
+- Extension manifests.
+- Local application communication bridge.
+- Download capture.
+- Download handoff.
+- Connection status.
+- Browser settings.
+- Installation instructions.
+
+Use minimum necessary browser permissions.
+
+Validate all messages received from extensions.
+
+---
+
+# 10. GEMINI AI ASSISTANT
+
+Integrate Google Gemini as an optional AI-powered assistant.
+
+Users must be able to provide their own Gemini API key.
+
+AI must never be required for normal download manager functionality.
+
+## 10.1 AI Configuration
+
+Include:
+
+- Enable / Disable.
+- Gemini API key.
+- Model selection.
+- Connection test.
+- API status.
+- Usage information where available.
+- Secure credential storage.
+- Clear key action.
+
+Use currently supported API endpoints and model identifiers.
+
+Never hardcode outdated model names.
+
+## 10.2 AI File Management
+
+Allow users to ask natural-language questions such as:
+
+- Find my largest downloaded files.
+- Find possible duplicate files.
+- Organize downloaded documents.
+- Suggest folder structures.
+- Explain file types.
+- Find old archive files.
+- Suggest file naming conventions.
+- Analyze storage usage.
+
+## 10.3 AI Security
+
+Use a preview-and-confirm workflow for file modifications.
+
+The workflow must be:
+
+1. Analyze the user's request.
+2. Generate a proposed action plan.
+3. Display affected files.
+4. Ask for explicit confirmation.
+5. Execute only approved actions.
+6. Report results.
+
+Never allow AI responses to execute arbitrary shell commands.
+
+Never silently delete, move, rename, or overwrite files.
+
+Protect credentials through operating-system secure storage whenever possible.
+
+Never expose API keys in logs or telemetry.
+
+Do not transmit file contents without explicit consent.
+
+---
+
+# 11. INTELLIGENT FILE MANAGEMENT
+
+Implement:
+
+- File categorization.
+- File search.
+- Duplicate detection.
+- Large file discovery.
+- File metadata inspection.
+- Storage visualization.
+- Folder organization.
+- Batch renaming.
+- Batch moving.
+- Conflict detection.
+
+All modifying actions must have a review and confirmation step.
+
+Never overwrite existing files silently.
+
+---
+
+# 12. SYSTEM INTEGRATION
+
+Implement where supported:
+
+- Desktop notifications.
+- System tray.
+- Minimize to tray.
+- Background downloads.
+- Launch on startup.
+- Download completion notifications.
+- Update notifications.
+
+Provide configurable permissions.
+
+---
+
+# 13. PLUGIN-READY ARCHITECTURE
+
+Prepare a secure modular extension architecture.
+
+Potential plugin categories:
+
+- Download providers.
+- Media extractors.
+- File processors.
+- Notification providers.
+- AI providers.
+- Browser integrations.
+- Categorization rules.
+
+Define interfaces, versioning, and permission boundaries.
+
+Do not allow arbitrary plugin code execution without an explicit and secure extension model.
+
+---
+
+# 14. SECURITY AND PRIVACY
+
+Security is mandatory.
+
+Implement:
+
+- Secure API key storage.
+- URL validation.
+- Path traversal protection.
+- Safe file destinations.
+- Restricted local communication.
+- Browser message validation.
+- Input validation.
+- No embedded credentials.
+- No automatic execution of downloaded files.
+- No hidden telemetry.
+- No unauthorized file uploads.
+- SSRF protections.
+- Safe logging.
+- Secure update verification.
+
+Provide a clear privacy configuration interface.
+
+---
+
+# 15. DATABASE
+
+Use a persistent database.
+
+Store:
+
+- Downloads.
+- Download history.
+- Queue configuration.
+- Categories.
+- Settings.
+- Scheduler configuration.
+- AI preferences.
+- Browser preferences.
+- User-defined rules.
+
+Implement:
+
+- Migrations.
+- Schema versioning.
+- Data validation.
+- Backup.
+- Restore.
+- Recovery.
+- Integrity checks.
+
+Never store sensitive API keys as ordinary plaintext database values.
+
+---
+
+# 16. CROSS-PLATFORM DISTRIBUTION
+
+Target:
+
+## Windows
+
+- Windows 10 and 11.
+- x64.
+- ARM64 where supported.
+
+Packages:
+
+- EXE.
+- MSI where supported.
+- Portable archive.
+
+## Linux
+
+- x64.
+- ARM64 where supported.
+
+Packages:
+
+- AppImage.
+- DEB.
+- RPM.
+
+Consider Flatpak support.
+
+## macOS
+
+- Apple Silicon.
+- Intel where supported.
+
+Packages:
+
+- DMG.
+- ZIP application bundle.
+
+Use suitable native build environments.
+
+Document signing and notarization requirements.
+
+Never claim a binary is signed or notarized unless verified.
+
+---
+
+# 17. INSTALLATION EXPERIENCE
+
+Provide:
+
+- Platform-specific installers.
+- First-launch experience.
+- Initial configuration.
+- Dependency checks.
+- Build scripts.
+- Installation guides.
+- Upgrade instructions.
+- Uninstallation instructions.
+
+Make installation straightforward for ordinary users.
+
+---
+
+# 18. OPTIONAL COMMAND-LINE INTERFACE
+
+Create a CLI if it adds genuine value.
+
+Suggested commands:
+
+- novaload download URL
+- novaload list
+- novaload pause ID
+- novaload resume ID
+- novaload cancel ID
+- novaload queue
+- novaload version
+
+CLI commands must communicate with the real application and download engine.
+
+---
+
+# 19. COMPLETE DOCUMENTATION SYSTEM
+
+Documentation must be extensive, professional, structured, and synchronized with the implementation.
+
+Do not generate thousands of meaningless files.
+
+Create a deep, navigable knowledge base with comprehensive coverage.
+
+Required documentation sections:
+
+## Project Documentation
+
+- Introduction.
+- Vision.
+- Features.
+- Supported platforms.
+- Screenshots.
+- Roadmap.
+- FAQ.
+- Project status.
+
+## User Documentation
+
+- Installation.
+- First launch.
+- Interface guide.
+- Downloads.
+- Queues.
+- Categories.
+- Scheduler.
+- Video Downloader.
+- Browser Integration.
+- AI Assistant.
+- Gemini setup.
+- File management.
+- Privacy.
+- Troubleshooting.
+
+## UI/UX Documentation
+
+- Brand guidelines.
+- Design philosophy.
+- Color system.
+- Typography.
+- Spacing.
+- Component library.
+- Navigation.
+- Screen specifications.
+- Interaction patterns.
+- Accessibility.
+- Animation guidelines.
+- Dark and light themes.
+- SVG asset catalog.
+
+## Architecture Documentation
+
+- System architecture.
+- Frontend architecture.
+- Backend architecture.
+- Download engine.
+- Connection management.
+- Database.
+- AI subsystem.
+- Browser bridge.
+- Plugin architecture.
+- Security.
+
+## Download Engine Documentation
+
+- HTTP.
+- HTTPS.
+- Range requests.
+- Segmentation.
+- Pause and resume.
+- Retry.
+- Integrity.
+- Error handling.
+- Speed control.
+
+## AI Documentation
+
+- Gemini setup.
+- API key security.
+- Model selection.
+- Request lifecycle.
+- File metadata analysis.
+- Confirmation workflows.
+- Privacy.
+- Rate limits.
+- Error handling.
+
+## Developer Documentation
+
+- Development setup.
+- Repository structure.
+- Build.
+- Testing.
+- Coding standards.
+- Contribution.
+- Debugging.
+- Database migrations.
+- Release process.
+
+## Security Documentation
+
+- Threat model.
+- Security policy.
+- Credential handling.
+- URL validation.
+- File operation security.
+- Browser bridge security.
+- Vulnerability reporting.
+
+## Release Documentation
+
+- Windows builds.
+- Linux builds.
+- macOS builds.
+- Packaging.
+- Code signing.
+- Checksums.
+- SBOM.
+- CI/CD.
+- Release publishing.
+
+## Open-Source Governance
+
+- Contribution guidelines.
+- Code of conduct.
+- Maintainer guidance.
+- Licensing.
+- Third-party attribution.
+
+Create a documentation website where practical.
+
+Include navigation, search, cross-links, and a complete table of contents.
+
+Document actual functionality only.
+
+---
+
+# 20. GITHUB REPOSITORY
+
+Prepare a professional public GitHub repository.
+
+Required files:
+
+- README.md
+- LICENSE
+- NOTICE
+- CONTRIBUTING.md
+- CODE_OF_CONDUCT.md
+- SECURITY.md
+- SUPPORT.md
+- CHANGELOG.md
+- ROADMAP.md
+- AUTHORS.md
+- CITATION.cff
+- .gitignore
+- .editorconfig
+- .gitattributes
+
+Also provide:
+
+- Issue templates.
+- Feature request templates.
+- Bug report templates.
+- Pull request templates.
+- Release notes template.
+- Code ownership configuration.
+- Dependency update configuration.
+- GitHub Actions workflows.
+- Third-party license inventory.
+- Repository contribution documentation.
+
+## README DESIGN
+
+Create an impressive README containing:
+
+- NovaLoad branding.
+- Logo.
+- Project description.
+- Feature overview.
+- Application screenshots.
+- Supported platforms.
+- Installation.
+- Quick start.
+- Documentation.
+- Build instructions.
+- Contribution.
+- License.
+- Security information.
+
+Use actual screenshots from the completed application.
+
+Never create fake screenshots or misleading status badges.
+
+---
+
+# 21. OPEN-SOURCE LICENSING
+
+NovaLoad must be genuinely open source.
+
+Preferred license for the original application:
+
+Apache License 2.0.
+
+Documentation:
+
+CC BY 4.0 where appropriate.
+
+Original visual assets:
+
+Explicitly documented open-source-compatible licensing.
+
+Include:
+
+- Complete license text.
+- Copyright notices.
+- THIRD_PARTY_LICENSES.md.
+- Dependency license auditing.
+- NOTICE.
+- Attribution.
+- Licensing documentation.
+
+Review direct and transitive dependency licenses.
+
+Do not incorrectly relicense third-party software.
+
+Do not copy proprietary IDM assets or source code.
+
+Create original NovaLoad branding and illustrations.
+
+---
+
+# 22. TESTING AND QUALITY ASSURANCE
+
+Write and execute real tests.
+
+## Download Engine
+
+Test:
+
+- HTTP.
+- HTTPS.
+- Large files.
+- Multi-connection downloads.
+- Range fallback.
+- Pause.
+- Resume.
+- Interrupted downloads.
+- Redirects.
+- Invalid URLs.
+- Retry.
+- Integrity.
+- Corrupted partial files.
+- Queue behavior.
+
+Use deterministic local test servers.
+
+## Application
+
+Test:
+
+- Startup.
+- Database.
+- Settings.
+- Navigation.
+- Download operations.
+- Theme switching.
+- File management.
+- AI configuration.
+- Error handling.
+
+## Security
+
+Test:
+
+- Path traversal.
+- Unsafe URLs.
+- Invalid file names.
+- Credential exposure.
+- Browser bridge validation.
+- Unauthorized file operations.
+- AI confirmation enforcement.
+
+## UI
+
+Test:
+
+- Navigation.
+- Dialogs.
+- Search.
+- Forms.
+- Download controls.
+- Empty states.
+- Error states.
+- Responsive desktop layouts.
+- Theme persistence.
+
+---
+
+# 23. GITHUB ACTIONS AND CI/CD
+
+Create complete automated workflows for:
+
+1. Pull Request Validation.
+2. Formatting.
+3. Linting.
+4. Frontend Tests.
+5. Rust Tests.
+6. Security Auditing.
+7. Dependency Auditing.
+8. Cross-Platform Builds.
+9. Installer Packaging.
+10. Documentation Validation.
+11. Release Publishing.
+
+Build matrix:
+
+- Windows x64.
+- Windows ARM64 where supported.
+- Linux x64.
+- Linux ARM64 where supported.
+- macOS Intel where supported.
+- macOS Apple Silicon.
+
+Use the appropriate runners and build dependencies.
+
+## Automated Releases
+
+When a version tag is pushed:
+
+1. Validate version.
+2. Run tests.
+3. Build application.
+4. Package installers.
+5. Generate checksums.
+6. Generate SBOM.
+7. Generate release metadata.
+8. Prepare release notes.
+9. Publish GitHub Release.
+10. Attach actual installation files.
+
+Expected artifacts:
+
+Windows:
+- EXE.
+- MSI where supported.
+- Portable ZIP.
+
+Linux:
+- AppImage.
+- DEB.
+- RPM.
+
+macOS:
+- DMG.
+- ZIP.
+
+Use clear architecture-specific filenames.
+
+Never publish fake, empty, or unverified installers.
+
+If external credentials or signing certificates are unavailable, configure the workflow correctly and document the remaining requirement.
+
+---
+
+# 24. AUTO-UPDATES
+
+Implement secure update support.
+
+Include:
+
+- Version checking.
+- Release channels.
+- Update notifications.
+- Update verification.
+- User-controlled installation.
+- Secure metadata.
+
+Use the framework's supported updater mechanism where appropriate.
+
+Never disable signature verification.
+
+Never commit private signing keys.
+
+---
+
+# 25. PERFORMANCE
+
+Optimize for long-running downloads and large files.
+
+Ensure:
+
+- Efficient streaming.
+- Bounded memory usage.
+- Controlled disk I/O.
+- Responsive UI.
+- Efficient database operations.
+- Safe background task handling.
+- Resource cleanup.
+- Graceful shutdown.
+
+Never load entire large files into memory unnecessarily.
+
+---
+
+# 26. ACCESSIBILITY AND INTERNATIONALIZATION
+
+Implement:
+
+- Keyboard navigation.
+- Screen reader labels.
+- Appropriate contrast.
+- Reduced motion.
+- Scalable layouts.
+- Localization infrastructure.
+
+English is the initial language.
+
+Prepare support for Persian and Arabic, including RTL layouts.
+
+---
+
+# 27. IMPLEMENTATION RULES
+
+These are mandatory.
+
+- Do not stop after planning.
+- Do not deliver only a prototype.
+- Do not leave important buttons nonfunctional.
+- Do not use mock functionality for core features.
+- Do not create empty placeholder modules.
+- Do not leave core TODOs unresolved.
+- Do not ignore errors.
+- Do not suppress warnings instead of fixing their causes.
+- Do not generate misleading documentation.
+- Do not invent successful tests.
+- Do not invent successful builds.
+- Do not invent release artifacts.
+- Do not expose credentials.
+- Do not overwrite existing work blindly.
+
+When an error occurs:
+
+1. Identify the cause.
+2. Fix the underlying issue.
+3. Re-run the failed operation.
+4. Run regression tests.
+5. Verify the fix.
+
+Do not stop at the first successful build.
+
+Continue until all feasible project components are complete.
+
+---
+
+# 28. SINGLE EXECUTION MISSION
+
+Complete the entire project within this execution session to the maximum extent permitted by the available environment.
+
+Do not repeatedly ask for permission to proceed to the next stage.
+
+Make reasonable independent engineering and design decisions.
+
+You are responsible for both the design and the implementation.
+
+If the existing design is poor, redesign it.
+
+If the architecture is unsuitable, improve it.
+
+If a module is incomplete, complete it.
+
+If a test fails, investigate and fix it.
+
+If documentation is missing, create it.
+
+If a release workflow is broken, repair it.
+
+Do not leave work unfinished merely because the initial roadmap has been completed.
+
+External prerequisites such as API keys, signing certificates, or unavailable platform runners must be documented honestly.
+
+Never claim that an unverified feature is complete.
+
+---
+
+# 29. FINAL VALIDATION
+
+Before completion, verify:
+
+## Design
+
+- [ ] Original NovaLoad visual identity.
+- [ ] Complete design system.
+- [ ] Professional dashboard.
+- [ ] All major application screens.
+- [ ] Dark theme.
+- [ ] Light theme.
+- [ ] System theme.
+- [ ] Custom SVG assets.
+- [ ] Original mascot.
+- [ ] SVG animations.
+- [ ] Consistent typography.
+- [ ] Consistent spacing.
+- [ ] Working interactions.
+- [ ] Accessible states.
+
+## Software
+
+- [ ] Application launches.
+- [ ] Download engine works.
+- [ ] Multi-connection downloading works where supported.
+- [ ] Pause and resume work.
+- [ ] Queue works.
+- [ ] Scheduler works.
+- [ ] History works.
+- [ ] Video Downloader works within documented support.
+- [ ] Browser integration works.
+- [ ] Gemini integration works when configured.
+- [ ] File management works.
+- [ ] Database persistence works.
+- [ ] Security protections work.
+
+## Repository
+
+- [ ] README.
+- [ ] LICENSE.
+- [ ] Third-party licenses.
+- [ ] Documentation.
+- [ ] Tests.
+- [ ] GitHub Actions.
+- [ ] Issue templates.
+- [ ] Contribution guidelines.
+- [ ] Security policy.
+- [ ] Release configuration.
+
+## Releases
+
+- [ ] Windows packaging.
+- [ ] Linux packaging.
+- [ ] macOS packaging.
+- [ ] Automated release workflow.
+- [ ] Checksums.
+- [ ] SBOM.
+- [ ] Release documentation.
+
+---
+
+# 30. FINAL ENGINEERING REPORT
+
+Provide a detailed final report containing:
+
+1. Design decisions.
+2. Brand identity.
+3. Design system.
+4. Implemented UI screens.
+5. SVG illustrations and animations.
+6. Final application architecture.
+7. Implemented features.
+8. Download engine capabilities.
+9. Gemini integration.
+10. Browser integration.
+11. Security implementation.
+12. Documentation inventory.
+13. Repository structure.
+14. License decisions.
+15. Tests actually executed.
+16. Build results.
+17. Generated installers.
+18. GitHub Actions workflows.
+19. Remaining external prerequisites.
+20. Known limitations.
+21. Local execution instructions.
+22. Production build instructions.
+23. Git repository status.
+
+If the remote GitHub repository is configured and the necessary permissions are available, prepare and push the completed work to the intended repository.
+
+Do not overwrite existing remote history or files blindly.
+
+---
+
+# FINAL DIRECTIVE
+
+You are not just a programmer implementing somebody else's design.
+
+You are the creator of the complete NovaLoad product.
+
+You must independently design its identity, user experience, interface, illustrations, animations, architecture, backend, frontend, download engine, AI integrations, documentation, tests, repository infrastructure, and release pipeline.
+
+The result must be a coherent, genuinely functional, professionally designed, open-source desktop application.
+
+**DESIGN IT. BUILD IT. TEST IT. FIX IT. DOCUMENT IT. PACKAGE IT. PREPARE IT FOR GITHUB.**
+
+Complete every feasible part of this mission in this single execution session.
+
+Do not deliver a proposal instead of the product.

@@ -1,0 +1,19 @@
+name: Feature Request
+description: Propose an improvement or new capability for NovaLoad
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: Describe the workflow gap or user need.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Design
+      description: Outline how the feature should work without compromising security or UX clarity.
+    validations:
+      required: true
