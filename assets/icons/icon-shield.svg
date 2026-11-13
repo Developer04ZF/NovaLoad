@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" role="img" aria-label="Security Shield Icon">
+  <rect x="2" y="2" width="28" height="28" rx="8" fill="#121722" stroke="#10B981" stroke-width="1.5"/>
+  <path d="M16 7.5L23 10.5V16C23 20.5 19.8 23.8 16 25C12.2 23.8 9 20.5 9 16V10.5L16 7.5Z" stroke="#34D399" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M13 16L15.2 18.2L19.5 13.8" stroke="#F8FAFC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

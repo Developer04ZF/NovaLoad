@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="220" viewBox="0 0 360 220" fill="none" role="img" aria-label="Success Celebration Static Fallback">
+  <rect x="2" y="2" width="356" height="216" rx="18" fill="#0B0E14" stroke="#232D3F" stroke-width="2"/>
+  <circle cx="180" cy="105" r="72" stroke="#10B981" stroke-opacity="0.35" stroke-width="2"/>
+  <line x1="180" y1="26" x2="180" y2="44" stroke="#64748B" stroke-width="4.5" stroke-linecap="round"/>
+  <circle cx="180" cy="23" r="6.5" fill="#10B981"/>
+  <path d="M120 82L104 94V118L120 111V82Z" fill="#1E293B" stroke="#475569" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M240 82L256 94V118L240 111V82Z" fill="#1E293B" stroke="#475569" stroke-width="2.5" stroke-linejoin="round"/>
+  <rect x="122" y="44" width="116" height="102" rx="26" fill="#161D2B" stroke="#10B981" stroke-width="2.5"/>
+  <rect x="136" y="60" width="88" height="54" rx="15" fill="#090D14" stroke="#1E293B" stroke-width="2"/>
+  <path d="M150 85C153 79 161 79 164 85" stroke="#34D399" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M196 85C199 79 207 79 210 85" stroke="#34D399" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M170 98L177 105L192 90" stroke="#10B981" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="150" y="126" width="60" height="8" rx="4" fill="#059669"/>
+  <path d="M82 46L84.5 51.5L90 54L84.5 56.5L82 62L79.5 56.5L74 54L79.5 51.5Z" fill="#34D399"/>
+  <path d="M278 50L280.5 55.5L286 58L280.5 60.5L278 66L275.5 60.5L270 58L275.5 55.5Z" fill="#60A5FA"/>
+  <rect x="92" y="164" width="176" height="26" rx="8" fill="#064E3B" stroke="#10B981" stroke-width="1.5"/>
+  <text x="180" y="181" text-anchor="middle" fill="#A7F3D0" font-family="ui-monospace, monospace" font-size="11" font-weight="700">SHA-256 CHECKSUM VERIFIED</text>
+</svg>

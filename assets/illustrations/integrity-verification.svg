@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="220" viewBox="0 0 440 220" fill="none" role="img" aria-label="Cryptographic Integrity Verification Illustration">
+  <rect x="2" y="2" width="436" height="216" rx="16" fill="#0F172A" stroke="#232D3F" stroke-width="1.5"/>
+  <text x="24" y="34" fill="#F8FAFC" font-family="system-ui, sans-serif" font-size="14" font-weight="700">Cryptographic Integrity Verification</text>
+  <text x="24" y="52" fill="#94A3B8" font-family="ui-monospace, monospace" font-size="11">Streaming SHA-256 &amp; SHA-512 Digest Comparison</text>
+
+  <rect x="24" y="76" width="392" height="106" rx="12" fill="#121722" stroke="#10B981" stroke-width="1.5"/>
+  <path d="M72 96L98 106V124C98 139 87 150 72 156C57 150 46 139 46 124V106L72 96Z" fill="#065F46" stroke="#34D399" stroke-width="2.2"/>
+  <path d="M62 125L69 132L83 118" stroke="#ECFDF5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="122" y="108" fill="#4ADE80" font-family="ui-monospace, monospace" font-size="12" font-weight="700">CHECKSUM VERIFIED MATCH</text>
+  <text x="122" y="130" fill="#CBD5E1" font-family="ui-monospace, monospace" font-size="10">SHA-256: 9f86d081884c7d659a2feaa0c55ad015…</text>
+  <text x="122" y="148" fill="#94A3B8" font-family="ui-monospace, monospace" font-size="10">Size: 524,288 bytes == Content-Length</text>
+  <text x="122" y="166" fill="#94A3B8" font-family="ui-monospace, monospace" font-size="10">Atomic rename: .part → final destination</text>
+</svg>

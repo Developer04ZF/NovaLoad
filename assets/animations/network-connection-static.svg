@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="220" viewBox="0 0 520 220" fill="none" role="img" aria-label="Network Connection Engine Static Fallback">
+  <rect x="2" y="2" width="516" height="216" rx="18" fill="#0B0E14" stroke="#232D3F" stroke-width="2"/>
+  <rect x="28" y="66" width="118" height="86" rx="14" fill="#121722" stroke="#334155" stroke-width="2"/>
+  <text x="87" y="96" text-anchor="middle" fill="#F8FAFC" font-family="ui-monospace, monospace" font-size="11" font-weight="700">HTTPS MIRROR</text>
+  <text x="87" y="116" text-anchor="middle" fill="#60A5FA" font-family="ui-monospace, monospace" font-size="10">HEAD / Range 0-0</text>
+  <text x="87" y="134" text-anchor="middle" fill="#34D399" font-family="ui-monospace, monospace" font-size="10">ETag + 206 OK</text>
+  <path d="M150 86C205 64 235 64 282 86" stroke="#3B82F6" stroke-width="2.5" stroke-dasharray="8 6"/>
+  <path d="M150 109H282" stroke="#22D3EE" stroke-width="2.5" stroke-dasharray="8 6"/>
+  <path d="M150 132C205 154 235 154 282 132" stroke="#10B981" stroke-width="2.5" stroke-dasharray="8 6"/>
+  <rect x="284" y="62" width="208" height="94" rx="14" fill="#121722" stroke="#2563EB" stroke-width="2"/>
+  <text x="388" y="88" text-anchor="middle" fill="#F8FAFC" font-family="ui-monospace, monospace" font-size="11" font-weight="700">TOKEN BUCKET PACER</text>
+  <text x="388" y="108" text-anchor="middle" fill="#94A3B8" font-family="ui-monospace, monospace" font-size="10">Global Cap · Queue Cap · Item Cap</text>
+  <rect x="308" y="122" width="160" height="10" rx="5" fill="#1E293B"/>
+  <rect x="308" y="122" width="118" height="10" rx="5" fill="#3B82F6"/>
+  <text x="388" y="147" text-anchor="middle" fill="#38BDF8" font-family="ui-monospace, monospace" font-size="10">1-16 CONNECTIONS · BACKOFF RETRY</text>
+  <text x="260" y="198" text-anchor="middle" fill="#94A3B8" font-family="ui-monospace, monospace" font-size="11">HOP-BY-HOP SSRF CHECK · AUTOMATIC SINGLE-STREAM FALLBACK</text>
+</svg>

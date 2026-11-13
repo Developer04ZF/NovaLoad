@@ -1,79 +1,339 @@
-# NovaLoad
+<div align="center">
 
-**Download smarter. Manage everything.**
+<img src="./assets/branding/hero-banner.svg" alt="NovaLoad Hero Banner — Novi Mascot and Segmented Range Engine" width="100%" />
 
-NovaLoad is an open-source, cross-platform desktop download manager designed to combine multi-connection transfer acceleration, persistent segmented pause/resume, queue scheduling, open media inspection, browser integration, and optional Gemini AI file organization inside a clean, high-craft interface.
+<br />
+
+<img src="./assets/branding/logo.svg" alt="NovaLoad Logo" height="44" />
+
+<h3>Download smarter. Manage everything.</h3>
+
+<p>
+  Open-source multi-connection HTTP/HTTPS download manager, persistent SQLite queue scheduler, SHA-256/512 integrity verifier, browser handoff bridge, and optional Gemini AI file organizer.
+</p>
+
+<p>
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/License-Apache--2.0-2563EB?style=flat-square" alt="License Apache-2.0" /></a>
+  <a href="./docs/README.md"><img src="https://img.shields.io/badge/Docs-CC%20BY%204.0-0EA5E9?style=flat-square" alt="Docs CC BY 4.0" /></a>
+  <img src="https://img.shields.io/badge/Node.js-%3E%3D22.5-10B981?style=flat-square" alt="Node.js >= 22.5" />
+  <img src="https://img.shields.io/badge/Desktop-Tauri%202%20%2B%20Rust-F59E0B?style=flat-square" alt="Tauri 2 + Rust" />
+  <img src="https://img.shields.io/badge/Platforms-Windows%20%7C%20Linux%20%7C%20macOS-1E293B?style=flat-square" alt="Windows | Linux | macOS" />
+</p>
+
+<p>
+  <a href="#installation"><strong>Installation</strong></a> ·
+  <a href="./docs/README.md"><strong>Documentation</strong></a> ·
+  <a href="#feature-showcase"><strong>Features</strong></a> ·
+  <a href="#architecture-overview"><strong>Architecture</strong></a> ·
+  <a href="./SECURITY.md"><strong>Security Policy</strong></a> ·
+  <a href="./CONTRIBUTING.md"><strong>Contributing</strong></a>
+</p>
+
+</div>
 
 ---
 
-## Key Capabilities
+## What Is NovaLoad?
 
-- **Multi-Connection Acceleration**: Splits HTTP/HTTPS transfers into configurable parallel byte-range segments (1–16 connections) when servers advertise `Accept-Ranges: bytes`, with automatic single-stream fallback when unsupported.
-- **Persistent Transfers & Integrity**: Saves segment offsets, ETag headers, and event logs in SQLite for crash-safe pause/resume and streams finished files through SHA-256 and SHA-512 checksum verification.
-- **Queues, Categories & Scheduler**: Multiple priority queues with concurrency caps, drag-and-drop ordering, extension-based folder routing, and timed schedule execution.
-- **Open Media & Video Downloader**: Inspects direct media containers and open HLS (`.m3u8`) playlists to select resolutions or audio tracks without DRM bypass.
-- **Browser Integration**: Minimal-permission Manifest V3 extensions for Chrome, Edge, and Firefox (`extensions/`) communicating over a token-authenticated local bridge (`/api/bridge/capture`).
-- **Optional Gemini AI Assistant**: Analyzes local file metadata via server-side `@google/genai` routes and proposes organization plans using a strict preview-and-confirm workflow. Never required for normal downloading.
-- **Security by Design**: SSRF blocking for private/loopback/metadata IPs, path traversal containment, zero hidden telemetry, and no automatic execution of downloaded files.
-- **Theme & Internationalization**: Synchronized Dark, Light, and System themes, reduced-motion compliance, and English (LTR), Persian (RTL), and Arabic (RTL) support.
+**NovaLoad** is an open-source download manager and file management workspace built for developers, power users, researchers, and media archivists who want transparent network control without telemetry, adware, or fragile closed-source binaries.
+
+### Why NovaLoad?
+- **Browser download bars lack control**: No byte-range multi-connection splitting, no per-queue speed shaping, and no built-in cryptographic checksum comparison.
+- **Legacy download managers lack modern architecture**: Older tools rely on brittle single-OS UI toolkits, silent file overwrites, or opaque background processes.
+- **Safety first**: NovaLoad enforces strict SSRF URL blocking at every HTTP redirect hop, contains every filesystem operation inside its managed downloads directory, never executes downloaded binaries, and isolates optional Gemini AI features behind a **Preview & Confirm** checklist.
 
 ---
 
-## Supported Platforms
+## Implementation Transparency
 
-- **Windows** (10/11 — x64, ARM64): NSIS `.exe`, `.msi`, portable `.zip` (configured in `src-tauri/` & `.github/workflows/release.yml`)
-- **Linux** (x64, ARM64): `.AppImage`, `.deb`, `.rpm`
-- **macOS** (Apple Silicon & Intel): `.dmg`, `.app.tar.gz` / `.zip`
-- **Local Web / Server Mode**: Node.js 22+ full-stack runtime on port `3000`
+NovaLoad clearly separates what runs today from packaging targets and explicit non-goals:
+
+| Tier | Capabilities | Details |
+| :--- | :--- | :--- |
+| **Implemented & Verified** | Multi-connection HTTP/HTTPS engine (`1–16`), automatic single-stream fallback, WAL SQLite persistence (`node:sqlite`), pause/resume, exponential retries, SHA-256/512 hashing, queues, scheduler, auto-categorization, file/duplicate manager, open media/`.m3u8` probe, Manifest V3 browser extensions, companion CLI, Dark/Light/System themes, EN/FA/AR RTL, optional server-side `@google/genai` assistant | Runnable immediately via Node.js `>= 22.5` (`npm run dev`), verified by Vitest integration/unit/UI suites |
+| **Configured Native Desktop** | Tauri 2 + Rust shell (`src-tauri/`) with system tray, native notifications, OS keyring helpers, updater config, and 6-target GitHub Actions matrix (Windows, Linux, macOS) | Requires local Rust/WebView toolchains or GitHub Actions tag release (`v*`) with signing secrets for verified public installers |
+| **Unsupported by Design** | DRM decryption, gated/paywalled stream bypass, BitTorrent/Magnet, automatic execution of downloads | Out of scope — see [Known Limitations](./docs/reference/known-limitations.md) |
 
 ---
 
-## Quick Start
+## Animated Transfer & Security Showcase
+
+> GitHub READMEs strip inline `<script>` tags and can throttle SVG CSS keyframes inside `<img>` proxies. Below we embed verified multi-frame `.gif` previews rendered directly from our vector specs alongside links to the editable animated `.svg` sources and `-static.svg` fallbacks.
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="./assets/animations/downloading-mascot.gif" alt="Animated Novi Mascot Downloading" width="320" />
+      <br />
+      <strong>Novi Active Transfer</strong><br />
+      <sub><a href="./assets/animations/downloading-mascot.svg">Editable SVG</a> · <a href="./assets/animations/downloading-mascot-static.svg">Static Fallback</a></sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="./assets/animations/file-transfer.gif" alt="Animated Multi-Connection Byte-Range File Transfer" width="440" />
+      <br />
+      <strong>Segmented Byte-Offset Writes</strong><br />
+      <sub><a href="./assets/animations/file-transfer.svg">Editable SVG</a> · <a href="./assets/animations/file-transfer-static.svg">Static Fallback</a></sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="./assets/animations/security-shield.gif" alt="Animated SSRF & Path Containment Security Shield" width="400" />
+      <br />
+      <strong>SSRF & Path Containment Guard</strong><br />
+      <sub><a href="./assets/animations/security-shield.svg">Editable SVG</a> · <a href="./assets/animations/security-shield-static.svg">Static Fallback</a></sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="./assets/animations/ai-assistant.gif" alt="Animated Gemini AI Preview and Confirm Workflow" width="400" />
+      <br />
+      <strong>Optional Gemini AI (Preview & Confirm)</strong><br />
+      <sub><a href="./assets/animations/ai-assistant.svg">Editable SVG</a> · <a href="./assets/animations/ai-assistant-static.svg">Static Fallback</a></sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="./assets/animations/progress-indicator.gif" alt="Animated Progress Telemetry Ring" width="400" />
+      <br />
+      <strong>Live Telemetry & Segment Ring</strong><br />
+      <sub><a href="./assets/animations/progress-indicator.svg">Editable SVG</a> · <a href="./assets/animations/progress-indicator-static.svg">Static Fallback</a></sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="./assets/animations/file-organization.gif" alt="Animated Automatic File Categorization" width="440" />
+      <br />
+      <strong>Automatic Extension Categorization</strong><br />
+      <sub><a href="./assets/animations/file-organization.svg">Editable SVG</a> · <a href="./assets/animations/file-organization-static.svg">Static Fallback</a></sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="./assets/animations/network-connection.gif" alt="Animated TokenBucket Pacer and Redirect Guard" width="440" />
+      <br />
+      <strong>TokenBucket Speed Shaping</strong><br />
+      <sub><a href="./assets/animations/network-connection.svg">Editable SVG</a> · <a href="./assets/animations/network-connection-static.svg">Static Fallback</a></sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="./assets/animations/success-celebration.gif" alt="Animated SHA-256 Verification Success" width="320" />
+      <br />
+      <strong>Verified Checksum Completion</strong><br />
+      <sub><a href="./assets/animations/success-celebration.svg">Editable SVG</a> · <a href="./assets/animations/success-celebration-static.svg">Static Fallback</a></sub>
+    </td>
+  </tr>
+</table>
+
+---
+
+## Feature Showcase
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="./assets/illustrations/multi-connection.svg" alt="Multi-Connection Acceleration Illustration" width="100%" />
+      <h4>Multi-Connection Acceleration & Fallback</h4>
+      <p>Probes origins with <code>HEAD</code> (or <code>GET Range: bytes=0-0</code>) and partitions transfers across <code>1–16</code> parallel byte-range connections into <code>.part</code> storage—automatically falling back to a single stream if Range requests are unsupported.</p>
+    </td>
+    <td width="50%" valign="top">
+      <img src="./assets/illustrations/pause-resume.svg" alt="Persistent Pause and Resume Illustration" width="100%" />
+      <h4>Persistent Pause, Resume & Auto-Retry</h4>
+      <p>Saves segment byte offsets and <code>ETag</code> headers inside WAL-mode SQLite. Pausing or unexpected shutdown recovers cleanly without losing downloaded ranges, backed by exponential retry backoff.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="./assets/illustrations/queue-scheduler.svg" alt="Queues and Timed Scheduler Illustration" width="100%" />
+      <h4>Priority Queues, Scheduler & Speed Limits</h4>
+      <p>Manage multiple priority queues with drag-and-drop reordering, timed queue start/pause/limit rules, and three-tier <code>TokenBucketPacer</code> bandwidth caps (global, queue, and per-download).</p>
+    </td>
+    <td width="50%" valign="top">
+      <img src="./assets/illustrations/integrity-verification.svg" alt="Cryptographic Integrity Verification Illustration" width="100%" />
+      <h4>SHA-256 / SHA-512 Verification & Categorization</h4>
+      <p>Automatically sorts completed files by extension (<code>/Software</code>, <code>/Archives</code>, <code>/Documents</code>, <code>/Video</code>, <code>/Audio</code>, <code>/Images</code>) and streams completed files through SHA-256 and SHA-512 hash verification.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="./assets/illustrations/browser-bridge.svg" alt="Browser Extension Bridge Illustration" width="100%" />
+      <h4>Chrome, Edge & Firefox Browser Bridge</h4>
+      <p>Minimal-permission Manifest V3 extensions (<code>extensions/</code>) add <em>Download with NovaLoad</em> context menus and optional download interception over a rotatable <code>x-novaload-token</code> local bridge.</p>
+    </td>
+    <td width="50%" valign="top">
+      <img src="./assets/illustrations/video-downloader.svg" alt="Open Media and HLS Inspector Illustration" width="100%" />
+      <h4>Open Media & Video Downloader</h4>
+      <p>Inspects direct MP4/WebM/MP3 sources and open HLS (<code>.m3u8</code>) variant playlists to queue preferred resolutions or audio-only tracks—strictly respecting DRM and platform terms.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="./assets/illustrations/gemini-ai.svg" alt="Optional Gemini AI File Assistant Illustration" width="100%" />
+      <h4>Optional Gemini AI File Assistant</h4>
+      <p>100% optional server-side <code>@google/genai</code> assistant that analyzes sanitized local metadata to spot duplicates and suggest folder cleanups behind a strict Preview &amp; Confirm workflow.</p>
+    </td>
+    <td width="50%" valign="top">
+      <img src="./assets/illustrations/file-management.svg" alt="File Inventory and Cross-Platform Desktop Illustration" width="100%" />
+      <h4>Disk Inventory, CLI & Cross-Platform Core</h4>
+      <p>Browse downloaded files, detect SHA-256 duplicates, control transfers via <code>cli/novaload.ts</code>, or package native Windows, Linux, and macOS builds via <code>src-tauri/</code>.</p>
+    </td>
+  </tr>
+</table>
+
+---
+
+## Meet Novi — The NovaLoad Mascot
+
+Novi communicates transfer status cleanly across dark and light interfaces:
+
+| Default | Happy | Downloading | Thinking |
+| :---: | :---: | :---: | :---: |
+| <img src="./assets/branding/mascot/mascot-default.svg" alt="Novi Default" width="96" /> | <img src="./assets/branding/mascot/mascot-happy.svg" alt="Novi Happy" width="96" /> | <img src="./assets/branding/mascot/mascot-downloading.svg" alt="Novi Downloading" width="96" /> | <img src="./assets/branding/mascot/mascot-thinking.svg" alt="Novi Thinking" width="96" /> |
+| `mascot-default.svg` | `mascot-happy.svg` | `mascot-downloading.svg` | `mascot-thinking.svg` |
+
+| Error | Success | Idle / Sleep | Security |
+| :---: | :---: | :---: | :---: |
+| <img src="./assets/branding/mascot/mascot-error.svg" alt="Novi Error" width="96" /> | <img src="./assets/branding/mascot/mascot-success.svg" alt="Novi Success" width="96" /> | <img src="./assets/branding/mascot/mascot-idle.svg" alt="Novi Idle" width="96" /> | <img src="./assets/branding/mascot/mascot-security.svg" alt="Novi Security" width="96" /> |
+| `mascot-error.svg` | `mascot-success.svg` | `mascot-idle.svg` | `mascot-security.svg` |
+
+See [Novi Mascot Guidelines](./docs/design/mascot-guidelines.md) for usage and design continuity rules.
+
+---
+
+## Screenshots & UI Showcase
+
+NovaLoad's UI includes Dashboard KPI telemetry, live bandwidth graphs, dense table and card download views, an interactive byte-range segment & checksum drawer, queue/scheduler managers, media probe, file duplicate manager, dark/light themes, and English/Persian/Arabic RTL support.
+
+> **Honest Status Notice**: Live UI screenshots are **not fabricated or mocked** in this repository. This documentation update was completed inside a headless container without Chromium, Playwright, or a display server available to capture live browser renders.
+>
+> Review [`assets/screenshots/README.md`](./assets/screenshots/README.md) for the exact screenshot checklist and instructions for capturing real screenshots from a running local instance (`http://localhost:3000`).
+
+---
+
+## Installation
 
 ### Prerequisites
+- **Node.js `>= 22.5.0`** (uses built-in `node:sqlite`)
+- **npm `>= 10`**
+- **Optional (Native Tauri 2 Desktop Packaging)**: Stable Rust (`rustup`), `cargo install tauri-cli`, plus OS WebView dependencies.
 
-- Node.js `>= 22.5` (uses built-in `node:sqlite`)
-- npm `>= 10`
-- Optional for native desktop packaging: Rust stable toolchain + Tauri 2 CLI (`cargo install tauri-cli`)
-
-### Run Locally
+### Run Locally from Source (Windows, Linux, macOS)
 
 ```bash
+git clone https://github.com/Developer04ZF/NovaLoad.git
+cd NovaLoad
 npm install
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Open **`http://localhost:3000`**. On first launch, NovaLoad initializes `.novaload/novaload.db`, creates `.novaload/downloads/`, and generates a random local browser bridge token.
 
-### Run Tests & Type Check
+To build and serve production frontend assets:
 
 ```bash
-npm test
-npm run lint
 npm run build
+NODE_ENV=production npm start
 ```
 
-### Companion CLI
+### Platform-Specific Packaging (`src-tauri/`)
+- **Windows (10/11 — `x64`, `ARM64`)**: Build NSIS `.exe` / `.msi` installers with MSVC Build Tools + WebView2 Runtime — see [Windows Packaging](./docs/deployment/windows.md).
+- **Linux (`x64`, `ARM64`)**: Install `libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf rpm` and build `.AppImage` / `.deb` / `.rpm` — see [Linux Packaging](./docs/deployment/linux.md).
+- **macOS (`Apple Silicon`, `Intel`)**: Build `.dmg` / `.app.tar.gz` bundles with Xcode Command Line Tools — see [macOS Packaging](./docs/deployment/macos.md).
+
+### Companion CLI (`cli/novaload.ts`)
 
 ```bash
 npx tsx cli/novaload.ts version
 npx tsx cli/novaload.ts download http://127.0.0.1:3000/api/fixtures/file/novaload-linux-x64.tar.gz --connections 6
 npx tsx cli/novaload.ts list
+npx tsx cli/novaload.ts pause <ID>
+npx tsx cli/novaload.ts resume <ID>
+```
+
+For environment variables (`PORT`, `NOVALOAD_DATA_DIR`, `GEMINI_API_KEY`, `NOVALOAD_API_URL`) and troubleshooting, see [Installation Guide](./docs/getting-started/installation.md) and [Deployment Troubleshooting](./docs/deployment/troubleshooting.md).
+
+---
+
+## Architecture Overview
+
+```mermaid
+flowchart TB
+  subgraph Clients
+    UI["React 19 + Tailwind v4 UI (src/)"]
+    EXT["Chrome / Edge / Firefox MV3 (extensions/)"]
+    CLI["NovaLoad CLI (cli/novaload.ts)"]
+  end
+
+  subgraph DesktopShell["Desktop Wrapper (Optional Native Build)"]
+    TAURI["Tauri 2 + Rust (src-tauri/) · Tray · Updater · OS Keyring"]
+  end
+
+  subgraph Backend["Node.js 22+ Backend (server.ts & server/)"]
+    API["Express REST & SSE /api/events"]
+    SEC["SSRF & Path Containment Guard (server/security.ts)"]
+    ENG["Multi-Connection DownloadManager + TokenBucketPacer"]
+    MED["MediaService (.m3u8 & Direct Streams)"]
+    FM["FileManagerService (Inventory & Deduplication)"]
+    AI["GeminiAssistantService (@google/genai)"]
+  end
+
+  DB[("node:sqlite WAL (.novaload/novaload.db)")]
+  DISK[("Managed Downloads (.novaload/downloads/)")]
+
+  TAURI --> UI
+  UI -->|REST + SSE| API
+  CLI -->|REST| API
+  EXT -->|POST /api/bridge/capture + token| API
+  API --> SEC
+  API --> ENG
+  API --> MED
+  API --> FM
+  API --> AI
+  ENG --> DB
+  ENG --> DISK
+  FM --> DISK
+```
+
+## Technology Stack
+
+| Layer | Technology | Responsibility |
+| :--- | :--- | :--- |
+| **Frontend UI** | React 19, Vite 8, TypeScript, Tailwind CSS v4, `lucide-react`, `motion` | Responsive multi-view workspace, dark/light themes, EN/FA/AR RTL localization, live SSE charts |
+| **Backend API** | Express 4, Zod 4, Server-Sent Events | Input validation, REST endpoints, deterministic local fixtures, real-time `snapshot` stream |
+| **Download Engine** | Node.js `fetch` streams, `fs/promises`, `node:crypto`, `TokenBucketPacer` | Parallel byte-range writes, automatic fallback, rate limiting, exponential retries, SHA-256/512 hashing |
+| **Persistence** | Node.js built-in `node:sqlite` (`DatabaseSync` WAL mode) | Versioned schema migrations, segment checkpoints, queue/schedule config, integrity checks |
+| **Desktop Shell** | Tauri 2, Rust (`reqwest`, `tokio`, `sha2`, `keyring`) | Native desktop windows, system tray, notifications, OS keyring helpers, multi-OS installers |
+| **Browser Integration** | Manifest V3 (`extensions/chrome-edge`, `extensions/firefox`) | Context menu & optional interception via token-authenticated `/api/bridge/capture` |
+| **Optional AI** | `@google/genai` (server-side only) | Metadata-only file organization plans presented in a Preview & Confirm dialog |
+| **Verification** | Vitest 5, Testing Library, TypeScript `tsc`, `scripts/validate-docs.mjs` | Security unit tests, integration tests, React UI tests, Markdown & SVG link validation |
+
+---
+
+## Documentation Hub
+
+Explore the structured knowledge base under [`docs/`](./docs/README.md):
+
+- **Getting Started**: [Introduction](./docs/getting-started/introduction.md) · [Installation](./docs/getting-started/installation.md) · [First Download](./docs/getting-started/first-download.md) · [Configuration](./docs/getting-started/configuration.md) · [Upgrading](./docs/getting-started/upgrading.md) · [Uninstalling](./docs/getting-started/uninstalling.md)
+- **User Guide**: [Dashboard](./docs/user-guide/dashboard.md) · [Downloads](./docs/user-guide/downloads.md) · [Multi-Connection](./docs/user-guide/multi-connection.md) · [Queues](./docs/user-guide/queues.md) · [Scheduler](./docs/user-guide/scheduler.md) · [Speed Limits](./docs/user-guide/speed-limits.md) · [File Manager](./docs/user-guide/file-management.md) · [Browser Integration](./docs/user-guide/browser-integration.md) · [Video Downloader](./docs/user-guide/video-downloader.md) · [AI Assistant](./docs/user-guide/ai-assistant.md)
+- **Architecture & Engine**: [System Overview](./docs/architecture/overview.md) · [Database Schema](./docs/architecture/database.md) · [Range Engine](./docs/download-engine/overview.md) · [Integrity Verification](./docs/download-engine/integrity-verification.md)
+- **Developers & Security**: [REST & SSE API Reference](./docs/developer-guide/api-reference.md) · [Testing](./docs/developer-guide/testing.md) · [Security Model](./docs/security/security-model.md) · [SSRF Protection](./docs/security/ssrf-protection.md) · [Threat Model](./docs/security/threat-model.md)
+- **Deployment & Reference**: [Production Builds](./docs/deployment/production-builds.md) · [GitHub Actions CI/CD](./docs/deployment/github-actions.md) · [Environment Variables](./docs/reference/environment-variables.md) · [FAQ](./docs/reference/faq.md)
+
+---
+
+## Verification Commands
+
+```bash
+npm run lint           # TypeScript type-check (tsc --noEmit)
+npm test               # Security unit, engine integration & React UI tests
+npm run build          # Production Vite SPA bundle
+npm run docs:validate  # Validate Markdown links, anchors, scripts & SVG assets
 ```
 
 ---
 
-## Documentation
+## Contributing, Security & Governance
 
-Complete user, design system, architecture, security, and release documentation lives in [`docs/`](./docs/README.md) and inside the in-app **Documentation** view.
+- **Contributing**: See [`CONTRIBUTING.md`](./CONTRIBUTING.md), [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md), and [`ROADMAP.md`](./ROADMAP.md).
+- **Support**: Review [`SUPPORT.md`](./SUPPORT.md) and [FAQ](./docs/reference/faq.md).
+- **Security**: Report vulnerabilities privately via GitHub Security Advisories or `security@novaload.org` following [`SECURITY.md`](./SECURITY.md).
 
-## Contributing & Security
+## License & Attribution
 
-- Read [`CONTRIBUTING.md`](./CONTRIBUTING.md) and [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md) before submitting pull requests.
-- Report security vulnerabilities responsibly following [`SECURITY.md`](./SECURITY.md).
-
-## License
-
-- Application source code: [Apache License 2.0](./LICENSE)
-- Documentation: CC BY 4.0
-- Attribution notices: [`NOTICE`](./NOTICE) & [`THIRD_PARTY_LICENSES.md`](./THIRD_PARTY_LICENSES.md)
+- **Source Code**: [Apache License 2.0](./LICENSE)
+- **Documentation & Visual Assets**: Creative Commons Attribution 4.0 International (CC BY 4.0)
+- **Notices & Dependencies**: [`NOTICE`](./NOTICE), [`THIRD_PARTY_LICENSES.md`](./THIRD_PARTY_LICENSES.md), [`AUTHORS.md`](./AUTHORS.md), and [`CHANGELOG.md`](./CHANGELOG.md).

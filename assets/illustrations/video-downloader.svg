@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="220" viewBox="0 0 440 220" fill="none" role="img" aria-label="Open Media and Video Downloader Illustration">
+  <rect x="2" y="2" width="436" height="216" rx="16" fill="#0F172A" stroke="#232D3F" stroke-width="1.5"/>
+  <text x="24" y="34" fill="#F8FAFC" font-family="system-ui, sans-serif" font-size="14" font-weight="700">Open Media &amp; HLS Stream Inspector</text>
+  <text x="24" y="52" fill="#94A3B8" font-family="ui-monospace, monospace" font-size="11">Direct Containers + Open .m3u8 Playlists · No DRM Bypass</text>
+
+  <rect x="24" y="76" width="166" height="104" rx="12" fill="#121722" stroke="#334155" stroke-width="1.5"/>
+  <circle cx="107" cy="120" r="24" fill="#2563EB" fill-opacity="0.2" stroke="#3B82F6" stroke-width="2"/>
+  <path d="M100 109L119 120L100 131V109Z" fill="#60A5FA"/>
+  <text x="64" y="166" fill="#94A3B8" font-family="ui-monospace, monospace" font-size="10">Media Probe</text>
+
+  <rect x="208" y="76" width="208" height="30" rx="8" fill="#121722" stroke="#3B82F6" stroke-width="1.5"/>
+  <text x="220" y="95" fill="#F8FAFC" font-family="ui-monospace, monospace" font-size="11">1080p MP4 · H.264 + AAC</text>
+  <rect x="208" y="113" width="208" height="30" rx="8" fill="#121722" stroke="#334155" stroke-width="1.5"/>
+  <text x="220" y="132" fill="#CBD5E1" font-family="ui-monospace, monospace" font-size="11">720p MP4 · H.264 + AAC</text>
+  <rect x="208" y="150" width="208" height="30" rx="8" fill="#121722" stroke="#06B6D4" stroke-width="1.5"/>
+  <text x="220" y="169" fill="#67E8F9" font-family="ui-monospace, monospace" font-size="11">Audio Only · MP3 320 kbps</text>
+</svg>

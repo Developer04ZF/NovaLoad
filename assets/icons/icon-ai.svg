@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" fill="none" role="img" aria-label="AI Assistant Icon">
+  <rect x="8" y="8" width="112" height="112" rx="28" fill="#121722" stroke="#232D3F" stroke-width="2.5"/>
+  <path d="M64 26L72.5 51.5L98 60L72.5 68.5L64 94L55.5 68.5L30 60L55.5 51.5L64 26Z" fill="#3B82F6" fill-opacity="0.2" stroke="#60A5FA" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="94" cy="34" r="6" fill="#22D3EE"/>
+  <circle cx="34" cy="88" r="4.5" fill="#10B981"/>
+</svg>

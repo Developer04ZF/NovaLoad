@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="220" viewBox="0 0 440 220" fill="none" role="img" aria-label="Optional Gemini AI File Assistant Illustration">
+  <rect x="2" y="2" width="436" height="216" rx="16" fill="#0F172A" stroke="#232D3F" stroke-width="1.5"/>
+  <text x="24" y="34" fill="#F8FAFC" font-family="system-ui, sans-serif" font-size="14" font-weight="700">Optional Gemini AI Preview-Confirm Workflow</text>
+  <text x="24" y="52" fill="#94A3B8" font-family="ui-monospace, monospace" font-size="11">Server-Side @google/genai · Metadata Only · Explicit Approval</text>
+
+  <rect x="24" y="78" width="116" height="100" rx="10" fill="#121722" stroke="#334155" stroke-width="1.5"/>
+  <text x="36" y="102" fill="#93C5FD" font-family="ui-monospace, monospace" font-size="10" font-weight="700">1. METADATA</text>
+  <text x="36" y="122" fill="#CBD5E1" font-family="ui-monospace, monospace" font-size="10">filenames</text>
+  <text x="36" y="138" fill="#CBD5E1" font-family="ui-monospace, monospace" font-size="10">sizes + hashes</text>
+  <text x="36" y="154" fill="#64748B" font-family="ui-monospace, monospace" font-size="10">no raw upload</text>
+
+  <path d="M142 128H162" stroke="#A855F7" stroke-width="2"/>
+
+  <rect x="164" y="78" width="118" height="100" rx="10" fill="#121722" stroke="#A855F7" stroke-width="1.5"/>
+  <text x="176" y="102" fill="#D8B4FE" font-family="ui-monospace, monospace" font-size="10" font-weight="700">2. ACTION PLAN</text>
+  <text x="176" y="122" fill="#E2E8F0" font-family="ui-monospace, monospace" font-size="10">gemini-4-hydrogen</text>
+  <text x="176" y="140" fill="#94A3B8" font-family="ui-monospace, monospace" font-size="10">JSON schema</text>
+  <text x="176" y="156" fill="#94A3B8" font-family="ui-monospace, monospace" font-size="10">no shell exec</text>
+
+  <path d="M284 128H304" stroke="#22C55E" stroke-width="2"/>
+
+  <rect x="306" y="78" width="110" height="100" rx="10" fill="#121722" stroke="#16A34A" stroke-width="1.5"/>
+  <text x="318" y="102" fill="#86EFAC" font-family="ui-monospace, monospace" font-size="10" font-weight="700">3. CONFIRM</text>
+  <rect x="318" y="116" width="84" height="22" rx="5" fill="#16A34A"/>
+  <text x="331" y="131" fill="#FFFFFF" font-family="system-ui, sans-serif" font-size="10" font-weight="700">Approve Plan</text>
+  <text x="318" y="156" fill="#94A3B8" font-family="ui-monospace, monospace" font-size="9">resolveSafePath</text>
+</svg>

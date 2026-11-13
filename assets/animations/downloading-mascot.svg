@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="220" viewBox="0 0 320 220" fill="none" role="img" aria-label="Animated Novi Mascot Downloading">
+  <style>
+    .novi-hover { animation: noviFloat 2.8s ease-in-out infinite; }
+    .beacon-ring { transform-origin: 160px 26px; animation: beaconPulse 1.8s ease-out infinite; }
+    .packet-1 { animation: pktDrop 1.4s linear infinite; }
+    .packet-2 { animation: pktDrop 1.4s linear 0.45s infinite; }
+    .packet-3 { animation: pktDrop 1.4s linear 0.9s infinite; }
+    .core-fill { animation: coreCharge 2.4s ease-in-out infinite; }
+    @keyframes noviFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+    @keyframes beaconPulse {
+      0% { transform: scale(0.8); opacity: 0.9; }
+      100% { transform: scale(2.1); opacity: 0; }
+    }
+    @keyframes pktDrop {
+      0% { transform: translateY(-10px); opacity: 0; }
+      30% { opacity: 1; }
+      85% { opacity: 1; }
+      100% { transform: translateY(24px); opacity: 0; }
+    }
+    @keyframes coreCharge {
+      0%, 100% { opacity: 0.75; }
+      50% { opacity: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .novi-hover, .beacon-ring, .packet-1, .packet-2, .packet-3, .core-fill { animation: none; }
+    }
+  </style>
+  <rect x="2" y="2" width="316" height="216" rx="18" fill="#0B0E14" stroke="#232D3F" stroke-width="2"/>
+  <ellipse cx="160" cy="192" rx="58" ry="9" fill="#020617" opacity="0.7"/>
+  <g class="novi-hover">
+    <line x1="160" y1="28" x2="160" y2="50" stroke="#64748B" stroke-width="5" stroke-linecap="round"/>
+    <circle class="beacon-ring" cx="160" cy="26" r="10" stroke="#38BDF8" stroke-width="2"/>
+    <circle cx="160" cy="26" r="7" fill="#3B82F6"/>
+    <path d="M96 92L78 106V132L96 124V92Z" fill="#1E293B" stroke="#475569" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M224 92L242 106V132L224 124V92Z" fill="#1E293B" stroke="#475569" stroke-width="2.5" stroke-linejoin="round"/>
+    <rect x="98" y="50" width="124" height="108" rx="28" fill="#161D2B" stroke="#334155" stroke-width="3"/>
+    <rect x="114" y="68" width="92" height="58" rx="16" fill="#090D14" stroke="#1E293B" stroke-width="2"/>
+    <circle cx="136" cy="92" r="5.5" fill="#60A5FA"/>
+    <circle cx="184" cy="92" r="5.5" fill="#60A5FA"/>
+    <path d="M160 80V108M160 108L149 97M160 108L171 97" stroke="#38BDF8" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="128" y="138" width="64" height="10" rx="5" fill="#0F172A"/>
+    <rect class="core-fill" x="132" y="140" width="46" height="6" rx="3" fill="#3B82F6"/>
+    <rect x="124" y="158" width="20" height="9" rx="4" fill="#334155"/>
+    <rect x="176" y="158" width="20" height="9" rx="4" fill="#334155"/>
+  </g>
+  <g>
+    <rect class="packet-1" x="148" y="168" width="6" height="10" rx="3" fill="#38BDF8"/>
+    <rect class="packet-2" x="158" y="168" width="6" height="10" rx="3" fill="#60A5FA"/>
+    <rect class="packet-3" x="168" y="168" width="6" height="10" rx="3" fill="#22D3EE"/>
+  </g>
+  <text x="160" y="208" text-anchor="middle" fill="#94A3B8" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11" font-weight="600">NOVI · MULTI-STREAM TRANSFER ACTIVE</text>
+</svg>

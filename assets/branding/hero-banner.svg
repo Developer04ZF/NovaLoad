@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="340" viewBox="0 0 960 340" fill="none" role="img" aria-label="NovaLoad Hero Illustration">
+  <defs>
+    <linearGradient id="heroBg" x1="0" y1="0" x2="960" y2="340" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0B0E14"/>
+      <stop offset="55%" stop-color="#101827"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="heroLogo" x1="56" y1="56" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="laneBar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#38BDF8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Canvas -->
+  <rect x="2" y="2" width="956" height="336" rx="20" fill="url(#heroBg)" stroke="#232D3F" stroke-width="2"/>
+
+  <!-- Subtle architectural grid -->
+  <g stroke="#1E293B" stroke-width="1" opacity="0.65">
+    <line x1="0" y1="85" x2="960" y2="85"/>
+    <line x1="0" y1="170" x2="960" y2="170"/>
+    <line x1="0" y1="255" x2="960" y2="255"/>
+    <line x1="240" y1="0" x2="240" y2="340"/>
+    <line x1="480" y1="0" x2="480" y2="340"/>
+    <line x1="720" y1="0" x2="720" y2="340"/>
+  </g>
+
+  <!-- Brand Lockup -->
+  <rect x="52" y="52" width="76" height="76" rx="18" fill="url(#heroLogo)" stroke="#93C5FD" stroke-opacity="0.45" stroke-width="1.5"/>
+  <path d="M90 65C104.912 65 117 77.088 117 92C117 106.912 104.912 119 90 119C75.088 119 63 106.912 63 92" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="4" stroke-linecap="round"/>
+  <path d="M90 72V102M90 102L78 90M90 102L102 90" stroke="#FFFFFF" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M75 111H105" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>
+
+  <text x="148" y="92" fill="#F8FAFC" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="44" font-weight="800" letter-spacing="-1">Nova<tspan fill="#60A5FA">Load</tspan></text>
+  <text x="150" y="122" fill="#94A3B8" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="18" font-weight="500">Download smarter. Manage everything.</text>
+
+  <!-- Multi-connection segment streams preview -->
+  <g transform="translate(52, 166)">
+    <rect x="0" y="0" width="520" height="122" rx="14" fill="#121722" stroke="#232D3F" stroke-width="1.5"/>
+    <text x="20" y="28" fill="#E2E8F0" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12" font-weight="600">MULTI-CONNECTION RANGE ENGINE · 6 PARALLEL SEGMENTS</text>
+
+    <rect x="20" y="42" width="480" height="8" rx="4" fill="#1E293B"/>
+    <rect x="20" y="42" width="390" height="8" rx="4" fill="url(#laneBar)"/>
+
+    <rect x="20" y="60" width="480" height="8" rx="4" fill="#1E293B"/>
+    <rect x="20" y="60" width="440" height="8" rx="4" fill="url(#laneBar)"/>
+
+    <rect x="20" y="78" width="480" height="8" rx="4" fill="#1E293B"/>
+    <rect x="20" y="78" width="320" height="8" rx="4" fill="url(#laneBar)"/>
+
+    <text x="20" y="106" fill="#4ADE80" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12">SHA-256 VERIFIED · SQLITE PERSISTENCE · SSRF GUARDED</text>
+  </g>
+
+  <!-- Novi Mascot Hero Pose -->
+  <g transform="translate(650, 44)">
+    <ellipse cx="120" cy="242" rx="68" ry="12" fill="#020617" opacity="0.65"/>
+    <!-- Antenna -->
+    <line x1="120" y1="22" x2="120" y2="50" stroke="#64748B" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="120" cy="18" r="10" fill="#3B82F6"/>
+    <circle cx="120" cy="18" r="16" stroke="#60A5FA" stroke-opacity="0.35" stroke-width="2"/>
+    <!-- Thruster fins -->
+    <path d="M40 108L16 126V158L40 148V108Z" fill="#1E293B" stroke="#475569" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M200 108L224 126V158L200 148V108Z" fill="#1E293B" stroke="#475569" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Chassis -->
+    <rect x="42" y="50" width="156" height="142" rx="38" fill="#161D2B" stroke="#334155" stroke-width="3.5"/>
+    <!-- Visor -->
+    <rect x="62" y="74" width="116" height="74" rx="22" fill="#090D14" stroke="#1E293B" stroke-width="2"/>
+    <!-- Downloading Eyes & Chevron -->
+    <circle cx="90" cy="100" r="7" fill="#60A5FA"/>
+    <circle cx="150" cy="100" r="7" fill="#60A5FA"/>
+    <path d="M120 92V124M120 124L107 111M120 124L133 111" stroke="#38BDF8" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Core bar -->
+    <rect x="82" y="162" width="76" height="12" rx="6" fill="#0F172A"/>
+    <rect x="88" y="165" width="46" height="6" rx="3" fill="#3B82F6"/>
+    <!-- Thrusters -->
+    <rect x="74" y="192" width="26" height="12" rx="5" fill="#334155"/>
+    <rect x="140" y="192" width="26" height="12" rx="5" fill="#334155"/>
+    <path d="M80 206L87 224L94 206Z" fill="#38BDF8" opacity="0.8"/>
+    <path d="M146 206L153 224L160 206Z" fill="#38BDF8" opacity="0.8"/>
+  </g>
+</svg>

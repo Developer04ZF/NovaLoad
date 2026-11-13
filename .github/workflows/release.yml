@@ -63,7 +63,7 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: "NovaLoad ${{ github.ref_name }}"
-          releaseBody: "See CHANGELOG.md and docs/release/PACKAGING.md for checksums and signing status."
+          releaseBody: "See CHANGELOG.md and docs/deployment/production-builds.md for checksums and signing status."
           releaseDraft: true
           prerelease: false
           args: --target ${{ matrix.target }}

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="220" viewBox="0 0 520 220" fill="none" role="img" aria-label="Animated File Organization">
+  <style>
+    .route-a { animation: slideRight 2.4s ease-in-out infinite; }
+    .route-b { animation: slideRight 2.4s ease-in-out 0.6s infinite; }
+    .route-c { animation: slideRight 2.4s ease-in-out 1.2s infinite; }
+    @keyframes slideRight { 0% { transform: translateX(0); opacity: 0.3; } 50% { transform: translateX(28px); opacity: 1; } 100% { transform: translateX(0); opacity: 0.3; } }
+    @media (prefers-reduced-motion: reduce) { .route-a, .route-b, .route-c { animation: none; } }
+  </style>
+  <rect x="2" y="2" width="516" height="216" rx="18" fill="#0B0E14" stroke="#232D3F" stroke-width="2"/>
+  <!-- Uncategorized Stream -->
+  <rect x="28" y="42" width="142" height="132" rx="14" fill="#121722" stroke="#334155" stroke-width="2"/>
+  <text x="99" y="64" text-anchor="middle" fill="#E2E8F0" font-family="ui-monospace, monospace" font-size="11" font-weight="700">COMPLETED QUEUE</text>
+  <rect x="44" y="78" width="110" height="20" rx="5" fill="#1E293B"/>
+  <text x="52" y="92" fill="#60A5FA" font-family="ui-monospace, monospace" font-size="10">installer.deb</text>
+  <rect x="44" y="106" width="110" height="20" rx="5" fill="#1E293B"/>
+  <text x="52" y="120" fill="#FBBF24" font-family="ui-monospace, monospace" font-size="10">dataset.tar.gz</text>
+  <rect x="44" y="134" width="110" height="20" rx="5" fill="#1E293B"/>
+  <text x="52" y="148" fill="#34D399" font-family="ui-monospace, monospace" font-size="10">spec-v2.pdf</text>
+  <!-- Routing Chevrons -->
+  <path class="route-a" d="M188 88H236M230 82L238 88L230 94" stroke="#60A5FA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path class="route-b" d="M188 116H236M230 110L238 116L230 122" stroke="#FBBF24" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path class="route-c" d="M188 144H236M230 138L238 144L230 150" stroke="#34D399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Categorized Folders -->
+  <rect x="282" y="42" width="210" height="36" rx="10" fill="#121722" stroke="#2563EB"/>
+  <text x="300" y="64" fill="#93C5FD" font-family="ui-monospace, monospace" font-size="11" font-weight="600">/Software/installer.deb</text>
+  <rect x="282" y="90" width="210" height="36" rx="10" fill="#121722" stroke="#D97706"/>
+  <text x="300" y="112" fill="#FCD34D" font-family="ui-monospace, monospace" font-size="11" font-weight="600">/Archives/dataset.tar.gz</text>
+  <rect x="282" y="138" width="210" height="36" rx="10" fill="#121722" stroke="#10B981"/>
+  <text x="300" y="160" fill="#6EE7B7" font-family="ui-monospace, monospace" font-size="11" font-weight="600">/Documents/spec-v2.pdf</text>
+  <text x="260" y="200" text-anchor="middle" fill="#94A3B8" font-family="ui-monospace, monospace" font-size="11">AUTO-CATEGORIZATION · SHA-256 DEDUPE · SAFE PATH MOVES</text>
+</svg>

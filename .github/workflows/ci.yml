@@ -44,6 +44,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
       - name: Verify required documentation and governance files exist
         run: |
           test -f README.md
@@ -51,3 +54,5 @@ jobs:
           test -f SECURITY.md
           test -f THIRD_PARTY_LICENSES.md
           test -f docs/README.md
+      - name: Validate Markdown links, anchors, and SVG assets
+        run: npm run docs:validate

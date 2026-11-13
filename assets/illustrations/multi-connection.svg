@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="220" viewBox="0 0 440 220" fill="none" role="img" aria-label="Multi-Connection Segmented Downloading Illustration">
+  <rect x="2" y="2" width="436" height="216" rx="16" fill="#0F172A" stroke="#232D3F" stroke-width="1.5"/>
+  <text x="24" y="34" fill="#F8FAFC" font-family="system-ui, sans-serif" font-size="14" font-weight="700">Parallel HTTP/HTTPS Range Segmentation</text>
+  <text x="24" y="52" fill="#94A3B8" font-family="ui-monospace, monospace" font-size="11">Accept-Ranges: bytes · 4 Non-Overlapping Segments</text>
+
+  <!-- Source server block -->
+  <rect x="24" y="74" width="90" height="106" rx="10" fill="#121722" stroke="#334155" stroke-width="1.5"/>
+  <text x="42" y="102" fill="#E2E8F0" font-family="ui-monospace, monospace" font-size="11" font-weight="600">ORIGIN</text>
+  <text x="36" y="122" fill="#60A5FA" font-family="ui-monospace, monospace" font-size="10">HTTP 206</text>
+  <text x="36" y="140" fill="#94A3B8" font-family="ui-monospace, monospace" font-size="10">Partial</text>
+  <text x="36" y="156" fill="#94A3B8" font-family="ui-monospace, monospace" font-size="10">Content</text>
+
+  <!-- 4 Segment lanes -->
+  <g font-family="ui-monospace, monospace" font-size="10">
+    <path d="M114 86H152" stroke="#3B82F6" stroke-width="2" stroke-dasharray="4 3"/>
+    <rect x="152" y="74" width="144" height="22" rx="6" fill="#1E293B"/>
+    <rect x="152" y="74" width="118" height="22" rx="6" fill="#2563EB"/>
+    <text x="162" y="89" fill="#FFFFFF">Seg 0: 0–249 KB</text>
+
+    <path d="M114 113H152" stroke="#38BDF8" stroke-width="2" stroke-dasharray="4 3"/>
+    <rect x="152" y="101" width="144" height="22" rx="6" fill="#1E293B"/>
+    <rect x="152" y="101" width="144" height="22" rx="6" fill="#0284C7"/>
+    <text x="162" y="116" fill="#FFFFFF">Seg 1: 250–499 KB</text>
+
+    <path d="M114 140H152" stroke="#3B82F6" stroke-width="2" stroke-dasharray="4 3"/>
+    <rect x="152" y="128" width="144" height="22" rx="6" fill="#1E293B"/>
+    <rect x="152" y="128" width="96" height="22" rx="6" fill="#2563EB"/>
+    <text x="162" y="143" fill="#FFFFFF">Seg 2: 500–749 KB</text>
+
+    <path d="M114 167H152" stroke="#38BDF8" stroke-width="2" stroke-dasharray="4 3"/>
+    <rect x="152" y="155" width="144" height="22" rx="6" fill="#1E293B"/>
+    <rect x="152" y="155" width="132" height="22" rx="6" fill="#0284C7"/>
+    <text x="162" y="170" fill="#FFFFFF">Seg 3: 750–999 KB</text>
+  </g>
+
+  <!-- Destination .part file -->
+  <path d="M296 86L330 120M296 113L330 124M296 140L330 130M296 167L330 136" stroke="#38BDF8" stroke-width="1.6"/>
+  <rect x="330" y="74" width="86" height="106" rx="10" fill="#121722" stroke="#16A34A" stroke-width="1.5"/>
+  <text x="342" y="102" fill="#4ADE80" font-family="ui-monospace, monospace" font-size="11" font-weight="700">.part</text>
+  <text x="342" y="122" fill="#E2E8F0" font-family="ui-monospace, monospace" font-size="10">Offset</text>
+  <text x="342" y="138" fill="#E2E8F0" font-family="ui-monospace, monospace" font-size="10">Writes</text>
+  <text x="342" y="158" fill="#94A3B8" font-family="ui-monospace, monospace" font-size="10">Bounded</text>
+</svg>
