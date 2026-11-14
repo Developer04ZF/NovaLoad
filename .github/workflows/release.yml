@@ -59,7 +59,7 @@ jobs:
       - run: npm run build:icons
       - run: npm run build:extensions
       - run: npm run validate:extensions
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: novaload-browser-extensions
           path: dist/extensions/NovaLoad-*-Extension-v*.zip
