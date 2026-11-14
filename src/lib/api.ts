@@ -19,10 +19,99 @@ import type {
   ScheduleRule,
 } from '../shared/types';
 
+export interface DesktopBackendInfo {
+  baseUrl: string;
+  token: string | null;
+  port: number;
+  ready: boolean;
+  error: string | null;
+}
+
+export interface UpdaterCheckResult {
+  supported: boolean;
+  status: 'up-to-date' | 'update-available' | 'unconfigured' | 'error' | 'web-mode';
+  currentVersion: string;
+  availableVersion?: string;
+  notes?: string;
+  message: string;
+}
+
+interface TauriInternals {
+  invoke: <T>(cmd: string, args?: Record<string, unknown>) => Promise<T>;
+}
+
+let cachedBaseUrl = '';
+let cachedLocalToken: string | null = null;
+
+export function isTauriDesktop(): boolean {
+  if (typeof window === 'undefined') return false;
+  const w = window as unknown as { __TAURI_INTERNALS__?: TauriInternals };
+  return Boolean(w.__TAURI_INTERNALS__ && typeof w.__TAURI_INTERNALS__.invoke === 'function');
+}
+
+export async function tauriInvoke<T>(cmd: string, args?: Record<string, unknown>): Promise<T> {
+  const w = window as unknown as { __TAURI_INTERNALS__?: TauriInternals };
+  if (!w.__TAURI_INTERNALS__?.invoke) {
+    throw new Error('Tauri desktop runtime is not active.');
+  }
+  return w.__TAURI_INTERNALS__.invoke<T>(cmd, args);
+}
+
+export function getApiBaseUrl(): string {
+  return cachedBaseUrl;
+}
+
+export function getEventsUrl(): string {
+  const base = `${cachedBaseUrl}/api/events`;
+  if (cachedLocalToken) {
+    return `${base}?localToken=${encodeURIComponent(cachedLocalToken)}`;
+  }
+  return base;
+}
+
+export async function initBackendConnection(): Promise<DesktopBackendInfo> {
+  if (!isTauriDesktop()) {
+    cachedBaseUrl = '';
+    cachedLocalToken = null;
+    return { baseUrl: '', token: null, port: 0, ready: true, error: null };
+  }
+
+  for (let attempt = 0; attempt < 40; attempt++) {
+    const info = await tauriInvoke<DesktopBackendInfo>('get_backend_info');
+    if (info.error) {
+      throw new Error(info.error);
+    }
+    if (info.ready && info.baseUrl) {
+      cachedBaseUrl = info.baseUrl.replace(/\/+$/, '');
+      cachedLocalToken = info.token || null;
+      return info;
+    }
+    await new Promise((r) => setTimeout(r, 150));
+  }
+
+  throw new Error('Timed out waiting for NovaLoad embedded backend service to become ready.');
+}
+
+export async function buildApiHeaders(extra?: HeadersInit): Promise<Record<string, string>> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (cachedLocalToken) {
+    headers['X-NovaLoad-Local-Token'] = cachedLocalToken;
+  }
+  if (extra) {
+    const h = new Headers(extra);
+    h.forEach((value, key) => {
+      headers[key] = value;
+    });
+  }
+  return headers;
+}
+
 async function requestJson<T>(url: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(url, {
-    headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) },
+  const target = url.startsWith('http') ? url : `${cachedBaseUrl}${url}`;
+  const headers = await buildApiHeaders(init?.headers);
+  const res = await fetch(target, {
     ...init,
+    headers,
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
@@ -144,4 +233,23 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ enabled }),
     }),
+
+  checkForUpdates: async (): Promise<UpdaterCheckResult> => {
+    if (!isTauriDesktop()) {
+      return {
+        supported: false,
+        status: 'web-mode',
+        currentVersion: '1.0.0',
+        message:
+          'Running in web/server mode. Automatic Tauri updates apply only inside installed desktop packages; update via git pull or the latest GitHub Release.',
+      };
+    }
+    return tauriInvoke<UpdaterCheckResult>('check_for_updates');
+  },
+  installUpdate: async (): Promise<{ ok: boolean; message: string }> => {
+    if (!isTauriDesktop()) {
+      return { ok: false, message: 'In-app update installation requires the installed Tauri desktop runtime.' };
+    }
+    return tauriInvoke<{ ok: boolean; message: string }>('install_update');
+  },
 };

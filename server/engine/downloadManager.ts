@@ -16,7 +16,13 @@ import type {
   DownloadSegment,
 } from '../../src/shared/types.ts';
 import { NovaDatabase } from '../db.ts';
-import { redactSecrets, resolveSafePath, sanitizeFilename, validateDownloadUrl } from '../security.ts';
+import {
+  redactSecrets,
+  resolveSafePath,
+  resolveSafeRealPath,
+  sanitizeFilename,
+  validateDownloadUrlWithDns,
+} from '../security.ts';
 
 export interface ProbeResult {
   url: string;
@@ -47,6 +53,7 @@ export interface CreateDownloadInput {
 interface ActiveJobRuntime {
   downloadId: string;
   abortControllers: AbortController[];
+  segmentControllers: Map<number, AbortController>;
   paused: boolean;
   cancelled: boolean;
   segmentSpeeds: Map<number, number>;
@@ -78,6 +85,7 @@ class TokenBucketPacer {
 export class DownloadManager extends EventEmitter {
   private readonly db: NovaDatabase;
   private readonly activeJobs = new Map<string, ActiveJobRuntime>();
+  private readonly jobPromises = new Map<string, Promise<void>>();
   private readonly globalPacer = new TokenBucketPacer();
   private readonly bandwidthHistory: BandwidthPoint[] = [];
   private peakSpeedBps = 0;
@@ -125,6 +133,16 @@ export class DownloadManager extends EventEmitter {
       for (const ac of job.abortControllers) ac.abort();
     }
     this.activeJobs.clear();
+  }
+
+  public async shutdown(timeoutMs = 2500): Promise<void> {
+    this.destroy();
+    const pending = Array.from(this.jobPromises.values());
+    if (pending.length === 0) return;
+    await Promise.race([
+      Promise.allSettled(pending),
+      new Promise((resolve) => setTimeout(resolve, timeoutMs)),
+    ]);
   }
 
   private recordBandwidthPoint(): void {
@@ -198,7 +216,7 @@ export class DownloadManager extends EventEmitter {
     let currentUrl = startUrl;
 
     for (let hop = 0; hop <= maxRedirects; hop++) {
-      const check = validateDownloadUrl(currentUrl, {
+      const check = await validateDownloadUrlWithDns(currentUrl, {
         blockPrivateIps: settings.privacyBlockPrivateIps,
         allowLocalFixturesPort: this.localFixturesPort,
       });
@@ -212,6 +230,7 @@ export class DownloadManager extends EventEmitter {
       });
 
       if (response.status >= 300 && response.status < 400) {
+        await response.body?.cancel();
         const location = response.headers.get('location');
         if (!location) {
           throw new Error(`HTTP ${response.status} redirect missing Location header.`);
@@ -228,7 +247,7 @@ export class DownloadManager extends EventEmitter {
 
   public async probeUrl(rawUrl: string): Promise<ProbeResult> {
     const settings = this.db.getSettings();
-    const validation = validateDownloadUrl(rawUrl, {
+    const validation = await validateDownloadUrlWithDns(rawUrl, {
       blockPrivateIps: settings.privacyBlockPrivateIps,
       allowLocalFixturesPort: this.localFixturesPort,
     });
@@ -593,6 +612,7 @@ export class DownloadManager extends EventEmitter {
     const runtime: ActiveJobRuntime = {
       downloadId: id,
       abortControllers: [],
+      segmentControllers: new Map(),
       paused: false,
       cancelled: false,
       segmentSpeeds: new Map(),
@@ -600,241 +620,362 @@ export class DownloadManager extends EventEmitter {
     };
     this.activeJobs.set(id, runtime);
 
-    const partPath = `${item.filePath}.part`;
-    let fileHandle: fsp.FileHandle | null = null;
+    const jobPromise = (async () => {
+      const partPath = `${item.filePath}.part`;
+      let fileHandle: fsp.FileHandle | null = null;
+      let consolidatedToSingleStream = false;
 
-    try {
-      fs.mkdirSync(item.destinationDir, { recursive: true });
-      this.db.updateDownload(id, { status: 'downloading', errorMessage: null });
+      try {
+        resolveSafeRealPath(this.db.downloadsDir, path.relative(this.db.downloadsDir, item.destinationDir));
+        fs.mkdirSync(item.destinationDir, { recursive: true });
+        this.db.updateDownload(id, { status: 'downloading', errorMessage: null });
 
-      if (!fs.existsSync(partPath)) {
-        fileHandle = await fsp.open(partPath, 'w+');
-        if (item.totalBytes > 0) {
-          await fileHandle.truncate(item.totalBytes);
-        }
-      } else {
-        fileHandle = await fsp.open(partPath, 'r+');
-      }
-
-      let segments = this.db.getSegments(id);
-      if (segments.length === 0) {
-        const built = this.buildInitialSegments(id, item.totalBytes, item.connections);
-        this.db.replaceSegments(id, built);
-        segments = this.db.getSegments(id);
-      }
-
-      // Check if single-stream non-range download had partial bytes; non-range servers require restart from 0
-      if (!item.supportsRanges && segments[0] && segments[0].downloadedBytes > 0) {
-        segments[0].downloadedBytes = 0;
-        this.db.updateSegmentProgress(id, 0, 0, 'pending', 0);
-        await fileHandle.truncate(0);
-        this.db.addEvent(id, 'warn', 'Server lacks Range support; restarting stream from byte 0.');
-      }
-
-      const activeHandle = fileHandle;
-
-      const runSegment = async (seg: DownloadSegment): Promise<void> => {
-        if (seg.status === 'completed') return;
-        const expectedLen = seg.endByte >= 0 ? seg.endByte - seg.startByte + 1 : -1;
-        if (expectedLen >= 0 && seg.downloadedBytes >= expectedLen) {
-          this.db.updateSegmentProgress(id, seg.segmentIndex, seg.downloadedBytes, 'completed', 0);
-          return;
-        }
-
-        const ac = new AbortController();
-        runtime.abortControllers.push(ac);
-        const startPos = seg.startByte + seg.downloadedBytes;
-        const headers: Record<string, string> = {};
-
-        if (item.supportsRanges && seg.endByte >= 0) {
-          headers['Range'] = `bytes=${startPos}-${seg.endByte}`;
-          if (item.etag) headers['If-Range'] = item.etag;
-        }
-
-        this.db.updateSegmentProgress(id, seg.segmentIndex, seg.downloadedBytes, 'active', 0);
-
-        const { response } = await this.fetchWithSafeRedirects(item.finalUrl, {
-          method: 'GET',
-          headers,
-          signal: ac.signal,
-        });
-
-        if (!response.ok && response.status !== 206) {
-          throw new Error(`Segment ${seg.segmentIndex} received HTTP ${response.status}`);
-        }
-
-        // If server ignored Range and returned 200 OK on segment > 0, abort secondary segments and fall back cleanly
-        if (item.supportsRanges && response.status === 200 && seg.segmentIndex > 0) {
-          await response.body?.cancel();
-          return;
-        }
-
-        if (!response.body) {
-          throw new Error('Response body is empty.');
-        }
-
-        const reader = response.body.getReader();
-        let bytesWritten = seg.downloadedBytes;
-        let windowBytes = 0;
-        let windowStart = Date.now();
-        const segPacer = new TokenBucketPacer();
-
-        while (true) {
-          if (runtime.paused || runtime.cancelled) {
-            await reader.cancel();
-            break;
+        if (!fs.existsSync(partPath)) {
+          fileHandle = await fsp.open(partPath, 'w+');
+          if (item.totalBytes > 0) {
+            await fileHandle.truncate(item.totalBytes);
           }
+        } else {
+          fileHandle = await fsp.open(partPath, 'r+');
+        }
 
-          const { done, value } = await reader.read();
-          if (done) break;
-          if (!value || value.length === 0) continue;
+        let segments = this.db.getSegments(id);
+        if (segments.length === 0) {
+          const built = this.buildInitialSegments(id, item.totalBytes, item.connections);
+          this.db.replaceSegments(id, built);
+          segments = this.db.getSegments(id);
+        }
 
-          const settings = this.db.getSettings();
-          const queue = this.db.getQueues().find((q) => q.id === item.queueId);
-          const effectiveDlLimit = item.speedLimitKbps ?? queue?.speedLimitKbps ?? null;
-          if (effectiveDlLimit) {
-            const perConnLimit = Math.max(8, Math.floor(effectiveDlLimit / Math.max(1, item.connections)));
-            await segPacer.consume(value.length, perConnLimit);
-          }
-          if (settings.globalSpeedLimitKbps) {
-            await this.globalPacer.consume(value.length, settings.globalSpeedLimitKbps);
-          }
+        // Check if single-stream non-range download had partial bytes; non-range servers require restart from 0
+        if (!item.supportsRanges && segments[0] && segments[0].downloadedBytes > 0) {
+          segments[0].downloadedBytes = 0;
+          this.db.updateSegmentProgress(id, 0, 0, 'pending', 0);
+          await fileHandle.truncate(0);
+          this.db.addEvent(id, 'warn', 'Server lacks Range support; restarting stream from byte 0.');
+        }
 
-          let chunkToWrite = value;
-          if (expectedLen >= 0 && bytesWritten + chunkToWrite.length > expectedLen) {
-            const remaining = expectedLen - bytesWritten;
-            if (remaining <= 0) break;
-            chunkToWrite = chunkToWrite.subarray(0, remaining);
-          }
+        const activeHandle = fileHandle;
 
-          const writeOffset = seg.startByte + bytesWritten;
-          await activeHandle.write(chunkToWrite, 0, chunkToWrite.length, writeOffset);
-          bytesWritten += chunkToWrite.length;
-          windowBytes += chunkToWrite.length;
+        const runSegment = async (seg: DownloadSegment): Promise<void> => {
+          try {
+            if (seg.status === 'completed') return;
+            let expectedLen = seg.endByte >= 0 ? seg.endByte - seg.startByte + 1 : -1;
+            if (expectedLen > 0 && seg.downloadedBytes >= expectedLen) {
+              this.db.updateSegmentProgress(id, seg.segmentIndex, seg.downloadedBytes, 'completed', 0);
+              return;
+            }
+            if (expectedLen === 0 && item.totalBytes === 0 && seg.downloadedBytes === 0 && seg.segmentIndex > 0) {
+              this.db.updateSegmentProgress(id, seg.segmentIndex, 0, 'completed', 0);
+              return;
+            }
 
-          const now = Date.now();
-          const elapsed = now - windowStart;
-          if (elapsed >= 350) {
-            const segSpeed = Math.round((windowBytes / elapsed) * 1000);
-            runtime.segmentSpeeds.set(seg.segmentIndex, segSpeed);
-            this.db.updateSegmentProgress(id, seg.segmentIndex, bytesWritten, 'active', segSpeed);
-            windowBytes = 0;
-            windowStart = now;
+            const ac = new AbortController();
+            runtime.abortControllers.push(ac);
+            runtime.segmentControllers.set(seg.segmentIndex, ac);
+            const startPos = seg.startByte + seg.downloadedBytes;
+            const headers: Record<string, string> = {};
+
+            if (item.supportsRanges && seg.endByte >= 0) {
+              headers['Range'] = `bytes=${startPos}-${seg.endByte}`;
+              if (item.etag) headers['If-Range'] = item.etag;
+            }
+
+            this.db.updateSegmentProgress(id, seg.segmentIndex, seg.downloadedBytes, 'active', 0);
+
+            const { response } = await this.fetchWithSafeRedirects(item.finalUrl, {
+              method: 'GET',
+              headers,
+              signal: ac.signal,
+            });
+
+            if (!response.ok && response.status !== 206) {
+              throw new Error(`Segment ${seg.segmentIndex} received HTTP ${response.status}`);
+            }
+
+            if (consolidatedToSingleStream && seg.segmentIndex > 0) {
+              await response.body?.cancel();
+              return;
+            }
+
+            // If server ignored Range (or If-Range mismatched ETag) and returned 200 OK
+            let bytesWritten = seg.downloadedBytes;
+            if (item.supportsRanges && response.status === 200) {
+              if (seg.segmentIndex > 0) {
+                await response.body?.cancel();
+                return;
+              }
+              consolidatedToSingleStream = true;
+              for (const [idx, ctrl] of runtime.segmentControllers.entries()) {
+                if (idx !== 0) ctrl.abort();
+              }
+              bytesWritten = 0;
+              seg.startByte = 0;
+              await activeHandle.truncate(0);
+              const clHeader = response.headers.get('content-length');
+              const parsedCl = clHeader !== null ? Number(clHeader) : item.totalBytes;
+              const nextTotal = Number.isFinite(parsedCl) && parsedCl >= 0 ? parsedCl : item.totalBytes;
+              expectedLen = nextTotal > 0 ? nextTotal : -1;
+              this.db.updateDownload(id, {
+                supportsRanges: false,
+                connections: 1,
+                totalBytes: nextTotal,
+                downloadedBytes: 0,
+              });
+              this.db.replaceSegments(id, [
+                {
+                  downloadId: id,
+                  segmentIndex: 0,
+                  startByte: 0,
+                  endByte: nextTotal > 0 ? nextTotal - 1 : -1,
+                  downloadedBytes: 0,
+                  status: 'active',
+                  speedBps: 0,
+                },
+              ]);
+              this.db.addEvent(
+                id,
+                'warn',
+                'Origin returned HTTP 200 instead of 206; consolidated transfer to single stream from byte 0.'
+              );
+            } else if (response.status === 206 && seg.downloadedBytes > 0 && item.etag) {
+              const respEtag = response.headers.get('etag');
+              if (respEtag && respEtag !== item.etag) {
+                await response.body?.cancel();
+                throw new Error(`Origin ETag changed mid-resume (expected ${item.etag}, got ${respEtag}).`);
+              }
+            } else if (response.status === 200 && seg.segmentIndex === 0) {
+              const clHeader = response.headers.get('content-length');
+              const parsedCl = clHeader !== null ? Number(clHeader) : NaN;
+              if (Number.isFinite(parsedCl) && parsedCl >= 0) {
+                if (item.totalBytes === 0 && parsedCl > 0) {
+                  this.db.updateDownload(id, { totalBytes: parsedCl });
+                } else if (item.totalBytes > 0 && parsedCl !== item.totalBytes) {
+                  await response.body?.cancel();
+                  throw new Error(
+                    `Content-Length mismatch: probed ${item.totalBytes} bytes, server declared ${parsedCl} bytes.`
+                  );
+                }
+              }
+            }
+
+            if (!response.body) {
+              // Empty body is valid for 0-byte files when Content-Length: 0
+              const clZero = response.headers.get('content-length') === '0';
+              if (clZero || item.totalBytes === 0) {
+                runtime.segmentSpeeds.set(seg.segmentIndex, 0);
+                this.db.updateSegmentProgress(id, seg.segmentIndex, bytesWritten, 'completed', 0);
+                this.flushAggregateProgress(id, runtime);
+                return;
+              }
+              throw new Error('Response body is empty.');
+            }
+
+            const reader = response.body.getReader();
+            let windowBytes = 0;
+            let windowStart = Date.now();
+            const segPacer = new TokenBucketPacer();
+
+            while (true) {
+              if (runtime.paused || runtime.cancelled || (consolidatedToSingleStream && seg.segmentIndex > 0)) {
+                await reader.cancel();
+                break;
+              }
+
+              const { done, value } = await reader.read();
+              if (done) break;
+              if (!value || value.length === 0) continue;
+
+              const settings = this.db.getSettings();
+              const queue = this.db.getQueues().find((q) => q.id === item.queueId);
+              const effectiveDlLimit = item.speedLimitKbps ?? queue?.speedLimitKbps ?? null;
+              if (effectiveDlLimit) {
+                const perConnLimit = Math.max(8, Math.floor(effectiveDlLimit / Math.max(1, item.connections)));
+                await segPacer.consume(value.length, perConnLimit);
+              }
+              if (settings.globalSpeedLimitKbps) {
+                await this.globalPacer.consume(value.length, settings.globalSpeedLimitKbps);
+              }
+
+              let chunkToWrite = value;
+              if (expectedLen >= 0 && bytesWritten + chunkToWrite.length > expectedLen) {
+                const remaining = expectedLen - bytesWritten;
+                if (remaining <= 0) break;
+                chunkToWrite = chunkToWrite.subarray(0, remaining);
+              }
+
+              const writeOffset = seg.startByte + bytesWritten;
+              await activeHandle.write(chunkToWrite, 0, chunkToWrite.length, writeOffset);
+              bytesWritten += chunkToWrite.length;
+              windowBytes += chunkToWrite.length;
+
+              const now = Date.now();
+              const elapsed = now - windowStart;
+              if (elapsed >= 350) {
+                const segSpeed = Math.round((windowBytes / elapsed) * 1000);
+                runtime.segmentSpeeds.set(seg.segmentIndex, segSpeed);
+                this.db.updateSegmentProgress(id, seg.segmentIndex, bytesWritten, 'active', segSpeed);
+                windowBytes = 0;
+                windowStart = now;
+                this.flushAggregateProgress(id, runtime);
+              }
+            }
+
+            if (consolidatedToSingleStream && seg.segmentIndex > 0) {
+              return;
+            }
+
+            if (runtime.paused || runtime.cancelled) {
+              runtime.segmentSpeeds.set(seg.segmentIndex, 0);
+              this.db.updateSegmentProgress(
+                id,
+                seg.segmentIndex,
+                bytesWritten,
+                runtime.paused ? 'paused' : 'error',
+                0
+              );
+              return;
+            }
+
+            if (expectedLen > 0 && bytesWritten < expectedLen) {
+              throw new Error(
+                `Truncated transfer: segment ${seg.segmentIndex} expected ${expectedLen} bytes, received ${bytesWritten} bytes.`
+              );
+            }
+
+            runtime.segmentSpeeds.set(seg.segmentIndex, 0);
+            this.db.updateSegmentProgress(id, seg.segmentIndex, bytesWritten, 'completed', 0);
             this.flushAggregateProgress(id, runtime);
+          } catch (segErr) {
+            if (consolidatedToSingleStream && seg.segmentIndex > 0) {
+              return;
+            }
+            throw segErr;
           }
-        }
+        };
+
+        await Promise.all(segments.map((s) => runSegment(s)));
+
+        await fileHandle.sync();
+        await fileHandle.close();
+        fileHandle = null;
 
         if (runtime.paused || runtime.cancelled) {
-          runtime.segmentSpeeds.set(seg.segmentIndex, 0);
-          this.db.updateSegmentProgress(
-            id,
-            seg.segmentIndex,
-            bytesWritten,
-            runtime.paused ? 'paused' : 'error',
-            0
-          );
           return;
         }
 
-        runtime.segmentSpeeds.set(seg.segmentIndex, 0);
-        this.db.updateSegmentProgress(id, seg.segmentIndex, bytesWritten, 'completed', 0);
-        this.flushAggregateProgress(id, runtime);
-      };
+        // Compute cryptographic hashes and verify integrity
+        this.db.updateDownload(id, { status: 'verifying', speedBps: 0, etaSeconds: 0 });
+        this.emit('snapshot', this.getSnapshot());
 
-      await Promise.all(segments.map((s) => runSegment(s)));
+        const { sha256, sha512, byteSize } = await this.computeHashes(partPath);
+        const latest = this.db.getDownload(id, false)!;
 
-      await fileHandle.sync();
-      await fileHandle.close();
-      fileHandle = null;
+        if (latest.totalBytes > 0 && byteSize !== latest.totalBytes) {
+          throw new Error(`Size mismatch: expected ${latest.totalBytes} bytes, received ${byteSize} bytes.`);
+        }
 
-      if (runtime.paused || runtime.cancelled) {
-        return;
-      }
+        let checksumVerified: boolean | null = null;
+        if (latest.expectedChecksum) {
+          const targetHash = latest.expectedChecksumAlgo === 'sha512' ? sha512 : sha256;
+          checksumVerified = targetHash.toLowerCase() === latest.expectedChecksum.toLowerCase();
+          if (!checksumVerified) {
+            throw new Error(
+              `Checksum mismatch (${latest.expectedChecksumAlgo?.toUpperCase()}): expected ${latest.expectedChecksum}, got ${targetHash}.`
+            );
+          }
+        }
 
-      // Compute cryptographic hashes and verify integrity
-      this.db.updateDownload(id, { status: 'verifying', speedBps: 0, etaSeconds: 0 });
-      this.emit('snapshot', this.getSnapshot());
+        await fsp.rename(partPath, latest.filePath);
 
-      const { sha256, sha512, byteSize } = await this.computeHashes(partPath);
-      const latest = this.db.getDownload(id, false)!;
+        this.db.updateDownload(id, {
+          status: 'completed',
+          downloadedBytes: byteSize,
+          totalBytes: latest.totalBytes > 0 ? latest.totalBytes : byteSize,
+          progress: 100,
+          speedBps: 0,
+          etaSeconds: 0,
+          actualSha256: sha256,
+          actualSha512: sha512,
+          checksumVerified,
+          completedAt: new Date().toISOString(),
+        });
 
-      if (latest.totalBytes > 0 && byteSize !== latest.totalBytes) {
-        throw new Error(`Size mismatch: expected ${latest.totalBytes} bytes, received ${byteSize} bytes.`);
-      }
+        this.db.addEvent(
+          id,
+          'success',
+          `Completed (${byteSize} bytes). SHA-256: ${sha256.slice(0, 16)}…${
+            checksumVerified ? ' [Checksum Verified]' : ''
+          }`
+        );
+      } catch (err) {
+        if (fileHandle) {
+          await fileHandle.close().catch(() => {});
+        }
 
-      let checksumVerified: boolean | null = null;
-      if (latest.expectedChecksum) {
-        const targetHash = latest.expectedChecksumAlgo === 'sha512' ? sha512 : sha256;
-        checksumVerified = targetHash.toLowerCase() === latest.expectedChecksum.toLowerCase();
-        if (!checksumVerified) {
-          throw new Error(
-            `Checksum mismatch (${latest.expectedChecksumAlgo?.toUpperCase()}): expected ${latest.expectedChecksum}, got ${targetHash}.`
+        if (runtime.paused || runtime.cancelled || (err as Error).name === 'AbortError') {
+          return;
+        }
+
+        const current = this.db.getDownload(id, false);
+        const settings = this.db.getSettings();
+        const errCode = (err as NodeJS.ErrnoException)?.code;
+        let rawMessage = (err as Error).message || 'Download failed';
+        if (errCode === 'ENOSPC') {
+          rawMessage = 'Insufficient disk space while writing download file (ENOSPC).';
+        } else if (errCode === 'EACCES' || errCode === 'EPERM' || errCode === 'EROFS') {
+          rawMessage = `Filesystem permission denied while writing download (${errCode}).`;
+        }
+        const message = redactSecrets(rawMessage);
+
+        if (current && settings.autoRetry && current.retryCount < current.maxRetries) {
+          const nextRetry = current.retryCount + 1;
+          this.db.updateDownload(id, {
+            status: 'queued',
+            retryCount: nextRetry,
+            speedBps: 0,
+            errorMessage: `Retry ${nextRetry}/${current.maxRetries}: ${message}`,
+          });
+          this.db.addEvent(
+            id,
+            'warn',
+            `Transient error (${message}); scheduling retry ${nextRetry}/${current.maxRetries}.`
           );
+          setTimeout(() => {
+            if (!this.destroyed) {
+              void this.dispatchQueuedDownloads();
+            }
+          }, Math.min(8000, 1000 * 2 ** nextRetry));
+        } else {
+          if (
+            message.includes('Checksum mismatch') ||
+            message.includes('Size mismatch') ||
+            message.includes('Content-Length mismatch') ||
+            message.includes('Truncated transfer')
+          ) {
+            await fsp.rm(partPath, { force: true }).catch(() => {});
+          }
+          this.db.updateDownload(id, {
+            status: 'failed',
+            speedBps: 0,
+            etaSeconds: null,
+            errorMessage: message,
+          });
+          this.db.addEvent(id, 'error', `Failed: ${message}`);
+        }
+      } finally {
+        this.activeJobs.delete(id);
+        if (!this.destroyed) {
+          this.emit('snapshot', this.getSnapshot());
+          void this.dispatchQueuedDownloads();
         }
       }
+    })();
 
-      await fsp.rename(partPath, latest.filePath);
-
-      this.db.updateDownload(id, {
-        status: 'completed',
-        downloadedBytes: byteSize,
-        totalBytes: latest.totalBytes > 0 ? latest.totalBytes : byteSize,
-        progress: 100,
-        speedBps: 0,
-        etaSeconds: 0,
-        actualSha256: sha256,
-        actualSha512: sha512,
-        checksumVerified,
-        completedAt: new Date().toISOString(),
-      });
-
-      this.db.addEvent(
-        id,
-        'success',
-        `Completed (${byteSize} bytes). SHA-256: ${sha256.slice(0, 16)}…${
-          checksumVerified ? ' [Checksum Verified]' : ''
-        }`
-      );
-    } catch (err) {
-      if (fileHandle) {
-        await fileHandle.close().catch(() => {});
-      }
-
-      if (runtime.paused || runtime.cancelled || (err as Error).name === 'AbortError') {
-        return;
-      }
-
-      const current = this.db.getDownload(id, false);
-      const settings = this.db.getSettings();
-      const message = redactSecrets((err as Error).message || 'Download failed');
-
-      if (current && settings.autoRetry && current.retryCount < current.maxRetries) {
-        const nextRetry = current.retryCount + 1;
-        this.db.updateDownload(id, {
-          status: 'queued',
-          retryCount: nextRetry,
-          speedBps: 0,
-          errorMessage: `Retry ${nextRetry}/${current.maxRetries}: ${message}`,
-        });
-        this.db.addEvent(id, 'warn', `Transient error (${message}); scheduling retry ${nextRetry}/${current.maxRetries}.`);
-        setTimeout(() => {
-          void this.dispatchQueuedDownloads();
-        }, Math.min(8000, 1000 * 2 ** nextRetry));
-      } else {
-        this.db.updateDownload(id, {
-          status: 'failed',
-          speedBps: 0,
-          etaSeconds: null,
-          errorMessage: message,
-        });
-        this.db.addEvent(id, 'error', `Failed: ${message}`);
-      }
+    this.jobPromises.set(id, jobPromise);
+    try {
+      await jobPromise;
     } finally {
-      this.activeJobs.delete(id);
-      if (!this.destroyed) {
-        this.emit('snapshot', this.getSnapshot());
-        void this.dispatchQueuedDownloads();
-      }
+      this.jobPromises.delete(id);
     }
   }
 

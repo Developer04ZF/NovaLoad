@@ -9,7 +9,7 @@ import fsp from 'node:fs/promises';
 import path from 'node:path';
 import type { AiProposedAction, DuplicateGroup, FileInventoryItem } from '../../src/shared/types.ts';
 import { NovaDatabase } from '../db.ts';
-import { resolveSafePath, sanitizeFilename } from '../security.ts';
+import { resolveSafeRealPath, sanitizeFilename } from '../security.ts';
 
 export class FileManagerService {
   private readonly db: NovaDatabase;
@@ -35,6 +35,7 @@ export class FileManagerService {
     const walk = async (dir: string): Promise<void> => {
       const entries = await fsp.readdir(dir, { withFileTypes: true }).catch(() => []);
       for (const entry of entries) {
+        if (entry.isSymbolicLink()) continue;
         const full = path.join(dir, entry.name);
         if (entry.isDirectory()) {
           await walk(full);
@@ -98,13 +99,13 @@ export class FileManagerService {
     for (const action of actions) {
       try {
         if (action.type === 'create_folder') {
-          const targetDir = resolveSafePath(root, action.targetPath || action.sourcePath);
+          const targetDir = resolveSafeRealPath(root, action.targetPath || action.sourcePath);
           await fsp.mkdir(targetDir, { recursive: true });
           succeeded++;
           continue;
         }
 
-        const safeSrc = resolveSafePath(root, action.sourcePath);
+        const safeSrc = resolveSafeRealPath(root, action.sourcePath);
         if (!fs.existsSync(safeSrc)) {
           throw new Error(`Source file not found: ${action.sourcePath}`);
         }
@@ -123,7 +124,7 @@ export class FileManagerService {
             action.type === 'rename'
               ? path.join(path.dirname(action.sourcePath), sanitizeFilename(path.basename(action.targetPath)))
               : action.targetPath;
-          const safeDest = resolveSafePath(root, parsedTarget);
+          const safeDest = resolveSafeRealPath(root, parsedTarget);
 
           if (fs.existsSync(safeDest)) {
             throw new Error(`Conflict detected: "${action.targetPath}" already exists (refusing silent overwrite).`);

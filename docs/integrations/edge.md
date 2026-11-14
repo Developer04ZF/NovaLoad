@@ -1,14 +1,16 @@
 # Microsoft Edge Setup
 
-## Loading the Unpacked Extension
-1. Ensure NovaLoad is running on `http://127.0.0.1:3000` and copy your **Bridge Auth Token** from **Browser Bridge**.
-2. Open Microsoft Edge and navigate to `edge://extensions`.
-3. Enable **Developer mode** in the left sidebar.
-4. Click **Load unpacked** and choose the `extensions/chrome-edge/` directory.
-5. Open the **NovaLoad Download Bridge** popup, paste the auth token, and optionally toggle **Auto-Intercept**.
+## Loading the Extension
+1. Launch NovaLoad and copy your active **Endpoint URL** and **Bridge Auth Token** (`nl_bridge_...`) from **Browser Bridge**.
+2. Download and extract `NovaLoad-Edge-Extension-v1.0.0.zip` (or use `extensions/edge/` from the repository).
+3. Open Microsoft Edge and navigate to `edge://extensions`.
+4. Enable **Developer mode** in the left sidebar.
+5. Click **Load unpacked** and choose the `edge` directory.
+6. Open the **NovaLoad Download Bridge** popup, paste the endpoint and auth token, click **Save Settings**, click **Test Connection**, and optionally toggle **Auto-Intercept**.
 
-`extensions/chrome-edge/background.js` automatically detects Edge (`navigator.userAgent.includes('Edg/')`) so recent bridge captures show `browser: "edge"` inside NovaLoad's bridge audit log.
+`extensions/edge/background.js` identifies browser requests from Edge cleanly so recent bridge captures show `browser: "edge"` inside NovaLoad's bridge audit log.
 
 ## Related Documentation
 - [Browser Extensions Overview](./browser-extensions.md)
+- [Browser Extensions Release Guide](../releases/browser-extensions.md)
 - [Google Chrome Setup](./chrome.md)

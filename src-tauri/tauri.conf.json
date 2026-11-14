@@ -21,7 +21,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; connect-src 'self' http://127.0.0.1:3000; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com"
+      "csp": "default-src 'self'; connect-src 'self' http://127.0.0.1:* http://localhost:* ws://127.0.0.1:* ws://localhost:*; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com"
     }
   },
   "bundle": {
@@ -30,6 +30,16 @@
     "category": "Utility",
     "shortDescription": "Next-generation open-source desktop download manager",
     "longDescription": "NovaLoad combines multi-connection HTTP/HTTPS acceleration, persistent segmented pause/resume, queue scheduling, browser integration, and optional Gemini AI file organization.",
+    "externalBin": [
+      "binaries/novaload-server"
+    ],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
     "windows": {
       "nsis": {
         "installMode": "currentUser"
@@ -44,7 +54,7 @@
   "plugins": {
     "updater": {
       "active": true,
-      "dialog": true,
+      "dialog": false,
       "endpoints": [
         "https://github.com/Developer04ZF/NovaLoad/releases/latest/download/latest.json"
       ]

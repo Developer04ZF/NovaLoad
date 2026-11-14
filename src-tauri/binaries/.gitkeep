@@ -1,0 +1,1 @@
+# Built desktop sidecar binaries are generated at build time via `npm run build:sidecar`.

@@ -6,7 +6,7 @@
 import React, { useEffect, useState } from 'react';
 import { Chrome, Puzzle, RefreshCw, Copy, Check, ShieldCheck, Globe } from 'lucide-react';
 import type { AppSettings, PluginDescriptor } from '../shared/types';
-import { api } from '../lib/api';
+import { api, getApiBaseUrl } from '../lib/api';
 import { formatRelativeTime } from '../lib/format';
 import { NovaIllustration } from './svg/NovaIllustrations';
 
@@ -28,6 +28,10 @@ export const BrowserBridgeAndPluginsView: React.FC<BrowserPluginsProps> = ({
   } | null>(null);
   const [plugins, setPlugins] = useState<PluginDescriptor[]>([]);
   const [copied, setCopied] = useState(false);
+  const [copiedEndpoint, setCopiedEndpoint] = useState(false);
+
+  const originBase = getApiBaseUrl() || window.location.origin;
+  const bridgeCaptureUrl = `${originBase}/api/bridge/capture`;
 
   const loadData = async () => {
     if (mode === 'browser') {
@@ -49,8 +53,14 @@ export const BrowserBridgeAndPluginsView: React.FC<BrowserPluginsProps> = ({
     setTimeout(() => setCopied(false), 1800);
   };
 
+  const copyEndpoint = async () => {
+    await navigator.clipboard.writeText(bridgeCaptureUrl);
+    setCopiedEndpoint(true);
+    setTimeout(() => setCopiedEndpoint(false), 1800);
+  };
+
   const testHandoff = async () => {
-    await fetch('/api/bridge/capture', {
+    await fetch(bridgeCaptureUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -58,9 +68,9 @@ export const BrowserBridgeAndPluginsView: React.FC<BrowserPluginsProps> = ({
       },
       body: JSON.stringify({
         browser: 'chrome',
-        url: `${window.location.origin}/api/fixtures/file/release-checksums.txt`,
+        url: `${originBase}/api/fixtures/file/release-checksums.txt`,
         filename: 'browser-captured-checksums.txt',
-        referrer: window.location.origin,
+        referrer: originBase,
       }),
     });
     await loadData();
@@ -74,7 +84,7 @@ export const BrowserBridgeAndPluginsView: React.FC<BrowserPluginsProps> = ({
           <div>
             <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Browser Integration Bridge</h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Connect NovaLoad extensions for Chrome, Edge, and Firefox using token-authenticated local download handoff.
+              Connect NovaLoad extensions for Brave, Chrome, Edge, and Firefox using token-authenticated local download handoff.
             </p>
           </div>
           <label className="inline-flex items-center gap-2 text-xs font-medium cursor-pointer">
@@ -96,8 +106,18 @@ export const BrowserBridgeAndPluginsView: React.FC<BrowserPluginsProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0D1119] p-3">
                 <div className="text-slate-500 dark:text-slate-400">Handoff Endpoint</div>
-                <div className="font-mono text-slate-900 dark:text-slate-100 mt-1 break-all">
-                  {window.location.origin}/api/bridge/capture
+                <div className="flex items-center justify-between gap-2 mt-1">
+                  <span className="font-mono text-slate-900 dark:text-slate-100 truncate">
+                    {bridgeCaptureUrl}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => void copyEndpoint()}
+                    aria-label="Copy handoff endpoint"
+                    className="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-800 shrink-0"
+                  >
+                    {copiedEndpoint ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                  </button>
                 </div>
               </div>
               <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0D1119] p-3">
@@ -131,14 +151,18 @@ export const BrowserBridgeAndPluginsView: React.FC<BrowserPluginsProps> = ({
             <div className="space-y-2 text-xs text-slate-600 dark:text-slate-300">
               <div className="font-semibold text-slate-900 dark:text-slate-100">Extension Installation Guide</div>
               <p>
-                <span className="font-medium">Chrome / Edge (Manifest V3):</span> Open{' '}
-                <code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800">chrome://extensions</code>, enable Developer Mode, click{' '}
-                <span className="font-medium">Load unpacked</span>, and select <code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800">extensions/chrome-edge</code>.
+                <span className="font-medium">Brave / Chrome / Edge (Manifest V3):</span> Extract your browser ZIP package (or select{' '}
+                <code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800">extensions/brave|chrome|edge</code>), open{' '}
+                <code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800">chrome://extensions</code> /{' '}
+                <code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800">brave://extensions</code> /{' '}
+                <code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800">edge://extensions</code>, enable Developer Mode, and click{' '}
+                <span className="font-medium">Load unpacked</span>.
               </p>
               <p>
                 <span className="font-medium">Firefox (WebExtension MV3):</span> Open{' '}
                 <code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800">about:debugging#/runtime/this-firefox</code>, click{' '}
-                <span className="font-medium">Load Temporary Add-on</span>, and select <code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800">extensions/firefox/manifest.json</code>.
+                <span className="font-medium">Load Temporary Add-on</span>, and select{' '}
+                <code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800">extensions/firefox/manifest.json</code> (or load the packaged Firefox ZIP).
               </p>
             </div>
 

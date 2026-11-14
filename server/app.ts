@@ -9,7 +9,11 @@ import { z } from 'zod';
 import { NovaDatabase } from './db.ts';
 import { DownloadManager } from './engine/downloadManager.ts';
 import { createFixtureRouter } from './routes/fixtures.ts';
-import { generateBridgeToken, redactSecrets, validateDownloadUrl } from './security.ts';
+import {
+  generateBridgeToken,
+  redactSecrets,
+  validateDownloadUrlWithDns,
+} from './security.ts';
 import { FileManagerService } from './services/fileManager.ts';
 import { GeminiAssistantService } from './services/geminiService.ts';
 import { MediaService } from './services/mediaService.ts';
@@ -22,6 +26,20 @@ export interface ServerAppBundle {
   fileManager: FileManagerService;
   mediaService: MediaService;
   geminiService: GeminiAssistantService;
+}
+
+const ALLOWED_ORIGIN_PATTERNS = [
+  /^https?:\/\/127\.0\.0\.1(:\d+)?$/i,
+  /^https?:\/\/localhost(:\d+)?$/i,
+  /^tauri:\/\/localhost$/i,
+  /^https?:\/\/tauri\.localhost$/i,
+  /^chrome-extension:\/\/[a-z0-9_-]+$/i,
+  /^moz-extension:\/\/[a-z0-9-]+$/i,
+  /^extension:\/\/[a-z0-9-]+$/i,
+];
+
+function isAllowedOrigin(origin: string): boolean {
+  return ALLOWED_ORIGIN_PATTERNS.some((rx) => rx.test(origin));
 }
 
 const createDownloadSchema = z.object({
@@ -39,9 +57,57 @@ const createDownloadSchema = z.object({
   mediaQuality: z.string().nullable().optional(),
 });
 
-export function createServerApp(options: { dataDir?: string; localFixturesPort?: number; startTimers?: boolean } = {}): ServerAppBundle {
+export function createServerApp(
+  options: {
+    dataDir?: string;
+    localFixturesPort?: number;
+    startTimers?: boolean;
+    localApiToken?: string;
+  } = {}
+): ServerAppBundle {
   const app = express();
   app.use(express.json({ limit: '2mb' }));
+
+  // Strict localhost / desktop WebView / extension CORS & local session token enforcement
+  app.use('/api', (req, res, next) => {
+    const origin = req.headers.origin;
+    if (origin) {
+      if (!isAllowedOrigin(origin)) {
+        return res.status(403).json({ error: `Forbidden cross-origin request from "${origin}".` });
+      }
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Vary', 'Origin');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+      res.setHeader(
+        'Access-Control-Allow-Headers',
+        'Content-Type, X-NovaLoad-Token, X-NovaLoad-Local-Token'
+      );
+    }
+
+    if (req.method === 'OPTIONS') {
+      return res.status(204).end();
+    }
+
+    if (options.localApiToken) {
+      const pathOnly = req.path;
+      const isPublicOrBridgeRoute =
+        pathOnly === '/health' ||
+        pathOnly.startsWith('/fixtures/') ||
+        pathOnly === '/bridge/capture' ||
+        pathOnly === '/bridge/ping';
+
+      if (!isPublicOrBridgeRoute) {
+        const headerToken = req.headers['x-novaload-local-token'];
+        const queryToken = typeof req.query.localToken === 'string' ? req.query.localToken : undefined;
+        const provided = Array.isArray(headerToken) ? headerToken[0] : headerToken || queryToken;
+        if (provided !== options.localApiToken) {
+          return res.status(401).json({ error: 'Unauthorized local desktop session token.' });
+        }
+      }
+    }
+
+    return next();
+  });
 
   const db = new NovaDatabase(options.dataDir);
   const downloadManager = new DownloadManager(db, {
@@ -58,7 +124,12 @@ export function createServerApp(options: { dataDir?: string; localFixturesPort?:
   // Health & DB integrity
   app.get('/api/health', (_req, res) => {
     const integrity = db.checkIntegrity();
-    res.json({ ok: integrity.ok, version: '1.0.0', database: integrity });
+    res.json({
+      ok: integrity.ok,
+      version: '1.0.0',
+      desktopMode: Boolean(options.localApiToken),
+      database: integrity,
+    });
   });
 
   // Full dashboard snapshot
@@ -368,6 +439,22 @@ export function createServerApp(options: { dataDir?: string; localFixturesPort?:
   });
 
   // Browser Extension Bridge
+  app.all('/api/bridge/ping', (req, res) => {
+    const settings = db.getSettings();
+    if (!settings.browserBridgeEnabled) {
+      return res.status(403).json({ ok: false, error: 'Browser bridge is disabled in NovaLoad settings.' });
+    }
+    const token = req.headers['x-novaload-token'] || req.query.token;
+    if (token !== settings.browserBridgeToken) {
+      return res.status(401).json({ ok: false, error: 'Invalid NovaLoad browser bridge token.' });
+    }
+    return res.json({
+      ok: true,
+      version: '1.0.0',
+      bridgeEnabled: true,
+    });
+  });
+
   app.get('/api/bridge/status', (_req, res) => {
     const settings = db.getSettings();
     const recent = db.db
@@ -396,7 +483,7 @@ export function createServerApp(options: { dataDir?: string; localFixturesPort?:
     const filename = typeof req.body?.filename === 'string' ? req.body.filename : null;
     const referrer = typeof req.body?.referrer === 'string' ? req.body.referrer : null;
 
-    const urlCheck = validateDownloadUrl(url, {
+    const urlCheck = await validateDownloadUrlWithDns(url, {
       blockPrivateIps: settings.privacyBlockPrivateIps,
       allowLocalFixturesPort: downloadManager.getLocalFixturesPort(),
     });

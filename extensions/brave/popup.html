@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>NovaLoad Bridge — Brave</title>
+    <style>
+      body { font-family: system-ui, -apple-system, sans-serif; width: 310px; margin: 0; padding: 14px; background: #0b0e14; color: #f1f5f9; }
+      .header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+      .header img { width: 20px; height: 20px; border-radius: 5px; }
+      h1 { font-size: 14px; margin: 0; font-weight: 700; }
+      .badge { margin-left: auto; font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #1e293b; color: #93c5fd; font-weight: 600; }
+      label { display: block; font-size: 11px; color: #94a3b8; margin-top: 9px; }
+      input[type="text"], input[type="url"] { width: 100%; box-sizing: border-box; padding: 7px 9px; margin-top: 4px; border-radius: 6px; border: 1px solid #232d3f; background: #121722; color: #f1f5f9; font-size: 12px; font-family: ui-monospace, monospace; }
+      .checkbox-row { display: flex; align-items: center; gap: 7px; margin-top: 10px; color: #cbd5e1; cursor: pointer; }
+      .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+      button { padding: 8px 10px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 12px; }
+      .btn-primary { background: #2563eb; color: #fff; }
+      .btn-secondary { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; }
+      .status { margin-top: 10px; font-size: 11px; line-height: 1.4; min-height: 16px; }
+      .status.ok { color: #4ade80; }
+      .status.err { color: #f87171; }
+      .hint { margin-top: 8px; font-size: 10px; color: #64748b; }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <img src="icons/icon-48.png" alt="NovaLoad" />
+      <h1>NovaLoad Bridge</h1>
+      <span class="badge">Brave</span>
+    </div>
+    <label>Local Handoff Endpoint<input id="endpoint" type="url" value="http://127.0.0.1:3000/api/bridge/capture" placeholder="http://127.0.0.1:PORT/api/bridge/capture" /></label>
+    <label>Pairing Token (x-novaload-token)<input id="token" type="text" placeholder="nl_bridge_..." /></label>
+    <label class="checkbox-row"><input id="autoIntercept" type="checkbox" /> Automatically intercept browser downloads</label>
+    <div class="actions">
+      <button id="save" class="btn-primary" type="button">Save Settings</button>
+      <button id="test" class="btn-secondary" type="button">Test Connection</button>
+    </div>
+    <div id="status" class="status"></div>
+    <div class="hint">Find your desktop port and token inside NovaLoad -> Browser Bridge.</div>
+    <script src="popup.js"></script>
+  </body>
+</html>

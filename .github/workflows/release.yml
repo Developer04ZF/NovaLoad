@@ -4,23 +4,69 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Optional release tag name (defaults to v<package.json version>)"
+        required: false
 
 permissions:
   contents: write
 
 jobs:
   verify:
+    name: Verify Tag, Versions, Tests & Docs
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      tag: ${{ steps.meta.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+      - id: meta
+        run: |
+          PKG_VER=$(node -e "console.log(require('./package.json').version)")
+          TAG_NAME="${{ inputs.tag || github.ref_name }}"
+          if [[ "$TAG_NAME" == v* && "$TAG_NAME" != "v${PKG_VER}" ]]; then
+            echo "::error::Tag ${TAG_NAME} does not match package.json version v${PKG_VER}."
+            exit 1
+          fi
+          echo "version=${PKG_VER}" >> "$GITHUB_OUTPUT"
+          echo "tag=v${PKG_VER}" >> "$GITHUB_OUTPUT"
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm run build:icons
+      - run: npm run build:extensions
+      - run: npm run build:sidecar
+      - run: npm test
+      - run: npm run validate:release
+
+  build-extensions:
+    name: Build & Verify Browser Extension Packages
+    needs: verify
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+          cache: "npm"
       - run: npm ci
-      - run: npm run lint
-      - run: npm test
+      - run: npm run build:icons
+      - run: npm run build:extensions
+      - run: npm run validate:extensions
+      - uses: actions/upload-artifact@v4
+        with:
+          name: novaload-browser-extensions
+          path: dist/extensions/NovaLoad-*-Extension-v*.zip
+          if-no-files-found: error
 
   build-desktop:
+    name: Build Desktop (${{ matrix.target }})
     needs: verify
     strategy:
       fail-fast: false
@@ -54,31 +100,119 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf rpm
       - run: npm ci
-      - name: Build Tauri bundles
+      - run: npm run build:icons
+      - name: Build embedded NovaLoad sidecar for ${{ matrix.target }}
+        run: node scripts/build-sidecar.mjs --target ${{ matrix.target }}
+      - name: Configure Tauri updater public key when secret is present
+        env:
+          TAURI_PUBLIC_KEY: ${{ secrets.TAURI_SIGNING_PUBLIC_KEY }}
+        shell: bash
+        run: |
+          if [ -n "$TAURI_PUBLIC_KEY" ]; then
+            node -e "
+              const fs = require('node:fs');
+              const p = 'src-tauri/tauri.conf.json';
+              const cfg = JSON.parse(fs.readFileSync(p, 'utf8'));
+              cfg.plugins = cfg.plugins || {};
+              cfg.plugins.updater = cfg.plugins.updater || {};
+              cfg.plugins.updater.pubkey = process.env.TAURI_PUBLIC_KEY;
+              fs.writeFileSync(p, JSON.stringify(cfg, null, 2) + '\n');
+            "
+          else
+            echo "::notice::TAURI_SIGNING_PUBLIC_KEY secret is not configured; desktop updater remains verification-gated."
+          fi
+      - name: Build Tauri desktop bundles
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: "NovaLoad ${{ github.ref_name }}"
-          releaseBody: "See CHANGELOG.md and docs/deployment/production-builds.md for checksums and signing status."
+          tagName: ${{ needs.verify.outputs.tag }}
+          releaseName: "NovaLoad ${{ needs.verify.outputs.tag }}"
+          releaseBody: "Automated multi-platform release for NovaLoad ${{ needs.verify.outputs.tag }}. Generating unified checksums and SBOM..."
           releaseDraft: true
           prerelease: false
           args: --target ${{ matrix.target }}
 
-  sbom-and-checksums:
-    needs: build-desktop
+  publish-release:
+    name: Generate SBOM, Checksums & Finalize Release Assets
+    needs: [verify, build-extensions, build-desktop]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
       - uses: anchore/sbom-action@v0
         with:
           path: .
           format: spdx-json
           output-file: novaload-sbom.spdx.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
-          name: novaload-sbom
-          path: novaload-sbom.spdx.json
+          name: novaload-browser-extensions
+          path: release-assets
+      - name: Download built desktop assets, compute SHA256SUMS.txt, and upload release artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ needs.verify.outputs.tag }}
+          VER: ${{ needs.verify.outputs.version }}
+          HAS_TAURI_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY != '' && secrets.TAURI_SIGNING_PUBLIC_KEY != '' }}
+        run: |
+          mkdir -p release-assets
+          cp novaload-sbom.spdx.json release-assets/
+          gh release download "$TAG" --dir release-assets || true
+          rm -f release-assets/SHA256SUMS.txt
+          node scripts/validate-artifacts.mjs --dir release-assets --write-checksums
+          node scripts/validate-artifacts.mjs --dir release-assets
+
+          SIGN_STATUS="Unsigned community CI build (configure TAURI_SIGNING_PUBLIC_KEY/PRIVATE_KEY and OS certificates for signed builds — see docs/releases/code-signing.md)."
+          if [ "$HAS_TAURI_KEY" = "true" ]; then
+            SIGN_STATUS="Tauri updater artifacts signed with repository Ed25519 key."
+          fi
+
+          cat << 'EOF' > RELEASE_BODY.md
+          # NovaLoad __TAG__
+
+          **Signing & Verification Status:** __SIGN_STATUS__
+
+          ## Desktop Installers (Bundled Standalone Runtime — No Node.js Required)
+          - **Windows (x64 / ARM64)**: `.exe` (NSIS installer), `.msi` (Windows Installer)
+          - **macOS (Apple Silicon / Intel)**: `.dmg` (Disk Image), `.app.tar.gz`
+          - **Linux (x64 / ARM64)**: `.AppImage`, `.deb` (Debian/Ubuntu), `.rpm` (Fedora/RHEL)
+
+          ## Browser Extensions (Manifest V3)
+          - `NovaLoad-Brave-Extension-v__VER__.zip`
+          - `NovaLoad-Chrome-Extension-v__VER__.zip`
+          - `NovaLoad-Edge-Extension-v__VER__.zip`
+          - `NovaLoad-Firefox-Extension-v__VER__.zip`
+
+          ## Security, SBOM & Checksums
+          - `SHA256SUMS.txt` — SHA-256 digests for all artifacts in this release
+          - `novaload-sbom.spdx.json` — SPDX Software Bill of Materials
+
+          Verify downloads before running:
+          ```bash
+          sha256sum -c SHA256SUMS.txt --ignore-missing
+          ```
+
+          See [`CHANGELOG.md`](https://github.com/__REPO__/blob/__TAG__/CHANGELOG.md) and [`docs/releases/README.md`](https://github.com/__REPO__/blob/__TAG__/docs/releases/README.md).
+          EOF
+          sed -i 's/^          //' RELEASE_BODY.md
+          TAG="$TAG" VER="$VER" SIGN_STATUS="$SIGN_STATUS" REPO="${{ github.repository }}" node -e "
+            const fs = require('node:fs');
+            let s = fs.readFileSync('RELEASE_BODY.md', 'utf8');
+            s = s.replaceAll('__TAG__', process.env.TAG)
+                 .replaceAll('__VER__', process.env.VER)
+                 .replaceAll('__SIGN_STATUS__', process.env.SIGN_STATUS)
+                 .replaceAll('__REPO__', process.env.REPO);
+            fs.writeFileSync('RELEASE_BODY.md', s);
+          "
+
+          gh release upload "$TAG" \
+            release-assets/NovaLoad-*-Extension-v*.zip \
+            release-assets/novaload-sbom.spdx.json \
+            release-assets/SHA256SUMS.txt \
+            --clobber
+          gh release edit "$TAG" --notes-file RELEASE_BODY.md --draft=false

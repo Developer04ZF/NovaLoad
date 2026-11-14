@@ -115,11 +115,82 @@ export function createFixtureRouter(): Router {
     await streamRangeOrFull(req, res, buf, outName, mime, true, 10);
   });
 
+  const flakyAttempts = new Map<string, number>();
+
+  // Advertises Accept-Ranges: bytes on HEAD, then ignores Range header and returns 200 OK full body on GET
+  router.all('/ignore-range/:name', async (req, res) => {
+    const name = String(req.params.name || 'ignored-range.bin');
+    const size = Number(req.query.size) > 0 ? Math.min(2 * 1024 * 1024, Number(req.query.size)) : 192 * 1024;
+    const buf = buildDeterministicBuffer(`ignore-range:${name}`, size);
+    res.setHeader('Content-Type', 'application/octet-stream');
+    res.setHeader('Content-Disposition', `attachment; filename="${name}"`);
+    res.setHeader('Accept-Ranges', 'bytes');
+    res.setHeader('Content-Length', String(buf.length));
+    if (req.method === 'HEAD') {
+      return res.status(200).end();
+    }
+    res.status(200);
+    await writeChunked(res, buf, 0);
+    return res.end();
+  });
+
+  // 0-byte empty file fixture
+  router.all('/empty/:name', (req, res) => {
+    const name = String(req.params.name || 'empty.txt');
+    res.setHeader('Content-Type', 'text/plain');
+    res.setHeader('Content-Disposition', `attachment; filename="${name}"`);
+    res.setHeader('Accept-Ranges', 'none');
+    res.setHeader('Content-Length', '0');
+    return res.status(200).end();
+  });
+
+  // Advertises larger Content-Length on HEAD than delivered bytes on GET (truncation failure)
+  router.all('/bad-length/:name', async (req, res) => {
+    const name = String(req.params.name || 'truncated.bin');
+    const advertisedSize = 65536;
+    res.setHeader('Content-Type', 'application/octet-stream');
+    res.setHeader('Content-Disposition', `attachment; filename="${name}"`);
+    res.setHeader('Accept-Ranges', 'none');
+    if (req.method === 'HEAD') {
+      res.setHeader('Content-Length', String(advertisedSize));
+      return res.status(200).end();
+    }
+    const partial = buildDeterministicBuffer(`bad:${name}`, 16384);
+    res.status(200);
+    res.write(partial);
+    return res.end();
+  });
+
+  // Fails with 503 on first N GET attempts, then succeeds cleanly for retry verification
+  router.all('/flaky/:name', async (req, res) => {
+    const name = String(req.params.name || 'flaky.bin');
+    const key = String(req.query.key || name);
+    const failCount = Math.max(1, Number(req.query.failCount || 1));
+    const buf = buildDeterministicBuffer(`flaky:${name}`, 64 * 1024);
+    if (req.method === 'HEAD') {
+      res.setHeader('Content-Length', String(buf.length));
+      res.setHeader('Accept-Ranges', 'bytes');
+      return res.status(200).end();
+    }
+    const count = (flakyAttempts.get(key) || 0) + 1;
+    flakyAttempts.set(key, count);
+    if (count <= failCount) {
+      return res.status(503).send('Simulated transient upstream outage');
+    }
+    await streamRangeOrFull(req, res, buf, name, 'application/octet-stream', true, 0);
+  });
+
+  // Redirects to blocked private loopback URL to verify multi-hop SSRF prevention
+  router.all('/redirect-private', (_req, res) => {
+    res.redirect(302, 'http://127.0.0.1:9999/internal-secret');
+  });
+
   router.get('/checksum/:name', (req, res) => {
     const name = String(req.params.name || 'sample-fast.bin');
     const entry = CATALOG[name] || { size: 256 * 1024, mime: 'application/octet-stream', throttleMs: 6 };
     const size = Number(req.query.size) > 0 ? Math.min(4 * 1024 * 1024, Number(req.query.size)) : entry.size;
-    const buf = buildDeterministicBuffer(name, size);
+    const prefix = req.query.prefix ? String(req.query.prefix) : '';
+    const buf = buildDeterministicBuffer(`${prefix}${name}`, size);
     res.json({
       filename: name,
       size,

@@ -24,13 +24,16 @@ NovaLoad/
 │   └── components/            # Modular UI views & inline SVG brand components
 ├── cli/novaload.ts            # Companion terminal CLI talking to NovaLoad REST API
 ├── extensions/
-│   ├── chrome-edge/           # Manifest V3 Chrome & Microsoft Edge extension
-│   └── firefox/               # Manifest V3 Firefox WebExtension manifest
-├── src-tauri/                 # Tauri 2 desktop config & Rust engine/security modules
+│   ├── shared/                # Shared MV3 background worker, popup, and manifest generator templates
+│   ├── brave/                 # Self-contained Brave MV3 package
+│   ├── chrome/                # Self-contained Google Chrome MV3 package
+│   ├── edge/                  # Self-contained Microsoft Edge MV3 package
+│   └── firefox/               # Self-contained Mozilla Firefox MV3 package
+├── src-tauri/                 # Tauri 2 desktop config, embedded sidecar runner & Rust modules
 ├── assets/                    # Brand logos, Novi mascot poses, animations, illustrations, icons
-├── docs/                      # Categorized documentation knowledge base
-├── scripts/validate-docs.mjs  # Automated Markdown & SVG integrity validator
-└── tests/                     # Security unit, engine integration, and React UI tests
+├── docs/                      # Categorized documentation knowledge base (including docs/releases/)
+├── scripts/                   # Sidecar, icon, extension ZIP, version, artifact & docs validators
+└── tests/                     # Security, engine integration, sidecar E2E, extension & UI tests
 ```
 
 ## Related Documentation

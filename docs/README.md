@@ -113,3 +113,12 @@ Every page in this knowledge base documents verified code paths, commands, API r
 - [Supported Platforms Matrix](./reference/supported-platforms.md)
 - [Known Limitations](./reference/known-limitations.md)
 - [Frequently Asked Questions](./reference/faq.md)
+
+### 11. Releases & Distribution
+- [Releases Overview](./releases/README.md)
+- [Platform Support & Artifacts](./releases/platform-support.md)
+- [Building Releases & Standalone Sidecars](./releases/building-releases.md)
+- [Browser Extensions Distribution](./releases/browser-extensions.md)
+- [Code Signing & Certificates](./releases/code-signing.md)
+- [Updating NovaLoad](./releases/updating.md)
+- [Release Checklist](./releases/release-checklist.md)

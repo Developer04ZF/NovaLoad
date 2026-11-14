@@ -31,7 +31,7 @@ import {
   X,
 } from 'lucide-react';
 import type { AppSettings, DashboardSnapshot, DownloadItem } from './shared/types';
-import { api } from './lib/api';
+import { api, getEventsUrl, initBackendConnection } from './lib/api';
 import { formatSpeed } from './lib/format';
 import { isRtlLocale, TRANSLATIONS } from './lib/i18n';
 import { NovaLogoMark, NovaLoadingMark } from './components/svg/NovaLogo';
@@ -79,6 +79,7 @@ export default function App() {
 
   const refreshSnapshot = useCallback(async () => {
     try {
+      await initBackendConnection();
       const snap = await api.getSnapshot();
       setSnapshot(snap);
       setLoadError(null);
@@ -88,26 +89,45 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    void refreshSnapshot();
+    let cancelled = false;
+    let evSource: EventSource | null = null;
 
-    const evSource = new EventSource('/api/events');
-    evSource.addEventListener('snapshot', (e) => {
+    const connect = async () => {
       try {
-        const parsed = JSON.parse((e as MessageEvent).data) as DashboardSnapshot;
-        setSnapshot(parsed);
+        await initBackendConnection();
+        if (cancelled) return;
+        const snap = await api.getSnapshot();
+        if (cancelled) return;
+        setSnapshot(snap);
         setLoadError(null);
-      } catch {
-        // ignore malformed frame
+
+        evSource = new EventSource(getEventsUrl());
+        evSource.addEventListener('snapshot', (e) => {
+          try {
+            const parsed = JSON.parse((e as MessageEvent).data) as DashboardSnapshot;
+            setSnapshot(parsed);
+            setLoadError(null);
+          } catch {
+            // ignore malformed frame
+          }
+        });
+        evSource.onerror = () => {
+          // EventSource automatically retries; keep UI non-blocking
+        };
+      } catch (err) {
+        if (!cancelled) {
+          setLoadError((err as Error).message);
+        }
       }
-    });
-    evSource.onerror = () => {
-      // EventSource automatically retries; keep UI non-blocking
     };
+
+    void connect();
 
     return () => {
-      evSource.close();
+      cancelled = true;
+      evSource?.close();
     };
-  }, [refreshSnapshot]);
+  }, []);
 
   // Synchronize theme (dark / light / system) and locale RTL direction
   useEffect(() => {

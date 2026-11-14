@@ -29,11 +29,21 @@ export class NovaDatabase {
       customDataDir || process.env.NOVALOAD_DATA_DIR || path.join(process.cwd(), '.novaload')
     );
     this.downloadsDir = path.join(this.dataDir, 'downloads');
-    fs.mkdirSync(this.dataDir, { recursive: true });
+    fs.mkdirSync(this.dataDir, { recursive: true, mode: 0o700 });
     fs.mkdirSync(this.downloadsDir, { recursive: true });
+    try {
+      fs.chmodSync(this.dataDir, 0o700);
+    } catch {
+      // Non-POSIX filesystems ignore chmod
+    }
 
     const dbPath = path.join(this.dataDir, 'novaload.db');
     this.db = new DatabaseSync(dbPath);
+    try {
+      fs.chmodSync(dbPath, 0o600);
+    } catch {
+      // Non-POSIX filesystems ignore chmod
+    }
     this.db.exec('PRAGMA journal_mode = WAL;');
     this.db.exec('PRAGMA foreign_keys = ON;');
     this.runMigrations();

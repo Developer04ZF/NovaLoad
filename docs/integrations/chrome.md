@@ -1,12 +1,13 @@
 # Google Chrome Setup
 
-## Loading the Unpacked Extension
-1. Start NovaLoad (`npm run dev` or production mode) so the bridge runs on `http://127.0.0.1:3000`.
-2. In NovaLoad, open **System → Browser Bridge** and copy your **Bridge Auth Token**.
-3. Open Google Chrome and navigate to `chrome://extensions`.
-4. Enable **Developer mode** (top-right toggle).
-5. Click **Load unpacked** and select the `extensions/chrome-edge/` folder from the repository.
-6. Pin **NovaLoad Download Bridge**, click its toolbar icon, paste your token, and save.
+## Loading the Extension
+1. Launch the NovaLoad desktop app (or start source server via `npm run dev`).
+2. In NovaLoad, open **System → Browser Bridge** and copy your active **Endpoint URL** and **Bridge Auth Token** (`nl_bridge_...`).
+3. Download and extract `NovaLoad-Chrome-Extension-v1.0.0.zip` from GitHub Releases (or use `extensions/chrome/` from the repository).
+4. Open Google Chrome and navigate to `chrome://extensions`.
+5. Enable **Developer mode** (top-right toggle).
+6. Click **Load unpacked** and select the extracted `chrome` folder.
+7. Pin **NovaLoad Download Bridge**, click its toolbar icon, paste your Endpoint URL and token, click **Save Settings**, and verify with **Test Connection**.
 
 ## Usage
 - Right-click any download link, `<video>`, or `<audio>` element and choose **Download with NovaLoad**.
@@ -18,4 +19,5 @@
 
 ## Related Documentation
 - [Browser Extensions Overview](./browser-extensions.md)
+- [Browser Extensions Release Guide](../releases/browser-extensions.md)
 - [Microsoft Edge Setup](./edge.md)

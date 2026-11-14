@@ -6,9 +6,12 @@ on:
   pull_request:
     branches: ["main"]
 
+permissions:
+  contents: read
+
 jobs:
   web-and-engine:
-    name: TypeCheck, Vitest & Build
+    name: TypeCheck, Build, Sidecar, Extensions & Vitest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,14 +21,24 @@ jobs:
           cache: "npm"
       - run: npm ci
       - run: npm run lint
-      - run: npm test
       - run: npm run build
+      - run: npm run build:icons
+      - run: npm run build:extensions
+      - run: npm run build:sidecar
+      - run: npm test
+      - run: npm run validate:versions
+      - run: npm run validate:extensions
+      - run: npm run validate:artifacts
 
   rust-core:
-    name: Rust Formatting & Unit Tests
+    name: Rust Formatting, Clippy & Unit Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
@@ -33,26 +46,40 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
-      - name: Cargo check & test
+      - name: Prepare frontend, icons, and sidecar binary for Tauri build script
+        run: |
+          npm ci
+          npm run build
+          npm run build:icons
+          npm run build:sidecar
+      - name: Cargo format, clippy, and unit tests
         working-directory: src-tauri
         run: |
           cargo fmt --check
+          cargo clippy --all-targets -- -D warnings
           cargo test --lib
 
   docs-check:
-    name: Documentation Check
+    name: Documentation, Releases & SVG Validation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Verify required documentation and governance files exist
+      - name: Verify required governance and release documentation files exist
         run: |
           test -f README.md
           test -f LICENSE
           test -f SECURITY.md
           test -f THIRD_PARTY_LICENSES.md
           test -f docs/README.md
-      - name: Validate Markdown links, anchors, and SVG assets
+          test -f docs/releases/README.md
+          test -f docs/releases/building-releases.md
+          test -f docs/releases/platform-support.md
+          test -f docs/releases/browser-extensions.md
+          test -f docs/releases/code-signing.md
+          test -f docs/releases/updating.md
+          test -f docs/releases/release-checklist.md
+      - name: Validate Markdown links, anchors, scripts, and SVG assets
         run: npm run docs:validate

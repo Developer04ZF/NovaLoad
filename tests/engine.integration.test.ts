@@ -209,4 +209,183 @@ describe('NovaLoad Download Engine & Persistence Integration', () => {
     expect(result.succeeded).toBe(0);
     expect(result.failed[0].error).toContain('Conflict detected');
   });
+
+  it('consolidates multi-connection download cleanly when server ignores Range and returns HTTP 200', async () => {
+    const metaRes = await fetch(`${baseUrl}/api/fixtures/checksum/ignored-range.bin?size=196608&prefix=ignore-range:`);
+    const expected = (await metaRes.json()) as { sha256: string; size: number };
+
+    const createRes = await fetch(`${baseUrl}/api/downloads`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: `${baseUrl}/api/fixtures/ignore-range/ignored-range.bin`,
+        connections: 4,
+        expectedChecksum: expected.sha256,
+        expectedChecksumAlgo: 'sha256',
+        startImmediately: true,
+      }),
+    });
+    expect(createRes.status).toBe(201);
+    const created = (await createRes.json()) as { id: string };
+    const finished = await waitForStatus(created.id, ['completed']);
+    expect(finished.actualSha256).toBe(expected.sha256);
+    expect(finished.checksumVerified).toBe(true);
+    expect(finished.supportsRanges).toBe(false);
+    expect(finished.connections).toBe(1);
+  });
+
+  it('completes 0-byte empty file downloads with valid empty SHA-256 digest', async () => {
+    const createRes = await fetch(`${baseUrl}/api/downloads`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: `${baseUrl}/api/fixtures/empty/empty.txt`,
+        startImmediately: true,
+      }),
+    });
+    expect(createRes.status).toBe(201);
+    const created = (await createRes.json()) as { id: string };
+    const finished = await waitForStatus(created.id, ['completed']);
+    expect(finished.actualSha256).toBe('e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855');
+    expect(fs.statSync(finished.filePath).size).toBe(0);
+  });
+
+  it('fails cleanly on truncated stream / Content-Length mismatch and cleans corrupt .part file', async () => {
+    const createRes = await fetch(`${baseUrl}/api/downloads`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: `${baseUrl}/api/fixtures/bad-length/truncated.bin`,
+        startImmediately: false,
+      }),
+    });
+    const created = (await createRes.json()) as { id: string; filePath: string };
+    bundle.db.updateDownload(created.id, { maxRetries: 0 });
+    await fetch(`${baseUrl}/api/downloads/${created.id}/start`, { method: 'POST' });
+
+    const failed = await waitForStatus(created.id, ['failed']);
+    expect(failed.status).toBe('failed');
+    expect(fs.existsSync(`${created.filePath}.part`)).toBe(false);
+  });
+
+  it('automatically retries transient 503 outage and completes on recovery', async () => {
+    const createRes = await fetch(`${baseUrl}/api/downloads`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: `${baseUrl}/api/fixtures/flaky/flaky.bin?failCount=1&key=matrix-retry-1`,
+        connections: 1,
+        startImmediately: true,
+      }),
+    });
+    const created = (await createRes.json()) as { id: string };
+    const finished = await waitForStatus(created.id, ['completed'], 15000);
+    expect(finished.status).toBe('completed');
+    expect((finished as unknown as { retryCount: number }).retryCount).toBeGreaterThanOrEqual(1);
+  });
+
+  it('blocks HTTP 302 redirect targeting private loopback IP (SSRF redirect guard)', async () => {
+    const res = await fetch(`${baseUrl}/api/downloads`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: `${baseUrl}/api/fixtures/redirect-private`,
+        startImmediately: true,
+      }),
+    });
+    expect(res.status).toBe(400);
+    const body = (await res.json()) as { error: string };
+    expect(body.error).toContain('SSRF');
+  });
+
+  it('completes large 2 MiB multi-connection transfer cleanly and verifies SHA-256', async () => {
+    const size = 2 * 1024 * 1024;
+    const metaRes = await fetch(`${baseUrl}/api/fixtures/checksum/large-chunked.bin?size=${size}`);
+    const expected = (await metaRes.json()) as { sha256: string };
+
+    const createRes = await fetch(`${baseUrl}/api/downloads`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: `${baseUrl}/api/fixtures/file/large-chunked.bin?size=${size}&throttle=0`,
+        connections: 6,
+        expectedChecksum: expected.sha256,
+        expectedChecksumAlgo: 'sha256',
+        startImmediately: true,
+      }),
+    });
+    const created = (await createRes.json()) as { id: string; connections: number };
+    expect(created.connections).toBe(6);
+    const finished = await waitForStatus(created.id, ['completed']);
+    expect(finished.actualSha256).toBe(expected.sha256);
+    expect(finished.checksumVerified).toBe(true);
+  });
+
+  it('cancels active transfer and removes partial .part file cleanly', async () => {
+    const createRes = await fetch(`${baseUrl}/api/downloads`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: `${baseUrl}/api/fixtures/file/sample-slow.bin`,
+        connections: 2,
+        startImmediately: true,
+      }),
+    });
+    const created = (await createRes.json()) as { id: string; filePath: string };
+    await new Promise((r) => setTimeout(r, 100));
+    const cancelRes = await fetch(`${baseUrl}/api/downloads/${created.id}/cancel`, { method: 'POST' });
+    expect(cancelRes.status).toBe(200);
+    const cancelled = (await cancelRes.json()) as { status: string };
+    expect(cancelled.status).toBe('cancelled');
+    await new Promise((r) => setTimeout(r, 80));
+    expect(fs.existsSync(`${created.filePath}.part`)).toBe(false);
+  });
+
+  it('enforces desktop localApiToken auth and strict CORS origin allowlist', async () => {
+    const secDir = fs.mkdtempSync(path.join(os.tmpdir(), 'novaload-sec-api-'));
+    const secBundle = createServerApp({
+      dataDir: secDir,
+      startTimers: false,
+      localApiToken: 'nl_local_test_token_123',
+    });
+    let secServer: http.Server | null = null;
+    try {
+      const port = await new Promise<number>((resolve) => {
+        secServer = secBundle.app.listen(0, '127.0.0.1', () => {
+          const addr = secServer!.address();
+          resolve(typeof addr === 'object' && addr ? addr.port : 0);
+        });
+      });
+      const secUrl = `http://127.0.0.1:${port}`;
+
+      const healthRes = await fetch(`${secUrl}/api/health`);
+      expect(healthRes.status).toBe(200);
+
+      const unauthSnap = await fetch(`${secUrl}/api/snapshot`);
+      expect(unauthSnap.status).toBe(401);
+
+      const authSnap = await fetch(`${secUrl}/api/snapshot`, {
+        headers: { 'X-NovaLoad-Local-Token': 'nl_local_test_token_123' },
+      });
+      expect(authSnap.status).toBe(200);
+
+      const evilCors = await fetch(`${secUrl}/api/health`, {
+        headers: { Origin: 'https://evil-site.example.com' },
+      });
+      expect(evilCors.status).toBe(403);
+
+      const tauriCors = await fetch(`${secUrl}/api/health`, {
+        headers: { Origin: 'tauri://localhost' },
+      });
+      expect(tauriCors.status).toBe(200);
+      expect(tauriCors.headers.get('access-control-allow-origin')).toBe('tauri://localhost');
+    } finally {
+      secBundle.downloadManager.destroy();
+      secBundle.db.close();
+      if (secServer) {
+        await new Promise<void>((resolve) => secServer!.close(() => resolve()));
+      }
+      fs.rmSync(secDir, { recursive: true, force: true });
+    }
+  });
 });

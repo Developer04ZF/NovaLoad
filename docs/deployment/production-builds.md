@@ -19,9 +19,11 @@ Tauri 2 packaging configuration (`src-tauri/tauri.conf.json`) and GitHub Actions
 - **Linux**: `x86_64-unknown-linux-gnu`, `aarch64-unknown-linux-gnu` (`.AppImage`, `.deb`, `.rpm`)
 - **macOS**: `aarch64-apple-darwin`, `x86_64-apple-darwin` (`.dmg`, `.app.tar.gz`)
 
-> Note: Native installer builds require Rust (`stable`), Tauri CLI, and platform WebView SDKs. Signing requires configured repository certificates.
+> Note: Native installer builds require Rust (`stable`), Tauri CLI, and platform WebView SDKs, while bundling the embedded `novaload-server` Node 22 SEA sidecar (`scripts/build-sidecar.mjs`). Signing requires configured repository certificates.
 
 ## Related Documentation
+- [Releases Overview](../releases/README.md)
+- [Building Releases & Sidecars](../releases/building-releases.md)
 - [Windows Packaging](./windows.md)
 - [Linux Packaging](./linux.md)
 - [macOS Packaging](./macos.md)
